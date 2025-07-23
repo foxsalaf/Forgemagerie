@@ -201,7 +201,6 @@
             font-weight: 500;
         }
 
-        .form-group input,
         .form-group select {
             width: 100%;
             padding: 1.2rem;
@@ -212,6 +211,17 @@
             font-size: 1.1rem;
             font-weight: 500;
             transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='white' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 12px;
+        }
+
+        .form-group select option {
+            background: #1e40af;
+            color: white;
+            padding: 0.5rem;
         }
 
         .form-group input::placeholder {
@@ -642,12 +652,12 @@
 
                         <div class="form-group">
                             <label style="font-size: 1.1rem; font-weight: 600;">🧳 Nombre de bagages</label>
-                            <select name="bag_count" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="1">1 bagage</option>
-                                <option value="2">2 bagages</option>
-                                <option value="3">3 bagages</option>
-                                <option value="4+">4 bagages ou plus</option>
+                            <select name="bag_count" required style="cursor: pointer;">
+                                <option value="" style="background: #1e40af; color: white;">Sélectionnez le nombre de bagages...</option>
+                                <option value="1" style="background: #1e40af; color: white;">1 bagage (17€/bagage)</option>
+                                <option value="2" style="background: #1e40af; color: white;">2 bagages (34€ + transport)</option>
+                                <option value="3" style="background: #1e40af; color: white;">3 bagages (51€ + transport)</option>
+                                <option value="4+" style="background: #1e40af; color: white;">4 bagages ou plus (68€ + transport)</option>
                             </select>
                         </div>
 
@@ -733,6 +743,60 @@
                     <p style="font-size: 1.2rem; font-weight: 600;">Métropole Aix-Marseille-Provence</p>
                     <p style="opacity: 0.9;">30+ villes desservies</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tarifs-section" id="tarifs" style="padding: 4rem 2rem; max-width: 1200px; margin: 0 auto;">
+        <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-radius: 20px; padding: 3rem; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <h2 style="color: white; font-size: 2.5rem; text-align: center; margin-bottom: 3rem;">💰 Nos Tarifs</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+                <!-- PMR -->
+                <div style="background: rgba(16, 185, 129, 0.15); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 15px; padding: 2rem; text-align: center; color: white;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">♿</div>
+                    <h3 style="margin-bottom: 1rem; color: #10b981;">Formule PMR</h3>
+                    <div style="font-size: 2.5rem; font-weight: 800; color: #fcd34d; margin: 1rem 0;">63€</div>
+                    <p style="margin-bottom: 1rem;">4 bagages inclus</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Tarif prioritaire pour personnes à mobilité réduite</p>
+                </div>
+
+                <!-- Famille -->
+                <div style="background: rgba(59, 130, 246, 0.15); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 15px; padding: 2rem; text-align: center; color: white;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👨‍👩‍👧‍👦</div>
+                    <h3 style="margin-bottom: 1rem; color: #3b82f6;">Formule Famille</h3>
+                    <div style="font-size: 2.5rem; font-weight: 800; color: #fcd34d; margin: 1rem 0;">110€</div>
+                    <p style="margin-bottom: 1rem;">8 bagages inclus</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Idéal pour les voyages en famille</p>
+                </div>
+
+                <!-- Individuel -->
+                <div style="background: rgba(249, 115, 22, 0.15); border: 2px solid rgba(249, 115, 22, 0.3); border-radius: 15px; padding: 2rem; text-align: center; color: white;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🧳</div>
+                    <h3 style="margin-bottom: 1rem; color: #f97316;">Formule Individuelle</h3>
+                    <div style="font-size: 2.5rem; font-weight: 800; color: #fcd34d; margin: 1rem 0;">68€</div>
+                    <p style="margin-bottom: 1rem;">4 bagages inclus</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Pour vos voyages personnels</p>
+                </div>
+
+                <!-- Supplémentaire -->
+                <div style="background: rgba(168, 85, 247, 0.15); border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 15px; padding: 2rem; text-align: center; color: white;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">➕</div>
+                    <h3 style="margin-bottom: 1rem; color: #a855f7;">Bagage Supplémentaire</h3>
+                    <div style="font-size: 2.5rem; font-weight: 800; color: #fcd34d; margin: 1rem 0;">9€</div>
+                    <p style="margin-bottom: 1rem;">Par bagage en plus</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Achat d'au moins une formule nécessaire</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem; padding: 1.5rem; background: rgba(249, 115, 22, 0.1); border-radius: 10px;">
+                <h4 style="color: #fcd34d; margin-bottom: 1rem;">ℹ️ Informations importantes</h4>
+                <p style="color: white; font-size: 0.9rem; line-height: 1.6;">
+                    • Supplément transport selon destination (Aéroport +15€, Port +12€, Gare +8€, Domicile +5€)<br>
+                    • Réduction PMR prioritaire incluse<br>
+                    • Service 24h/24 disponible<br>
+                    • Assurance bagages incluse
+                </p>
             </div>
         </div>
     </section>
