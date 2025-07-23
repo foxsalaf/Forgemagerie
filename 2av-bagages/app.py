@@ -5,7 +5,7 @@ import json
 from datetime import datetime, timedelta
 import smtplib
 from email.mime.text import MIMEText
-from email.mime.multipart import MimeMultipart
+from email.mime.multipart import MIMEMultipart
 import os
 from functools import wraps
 import requests
