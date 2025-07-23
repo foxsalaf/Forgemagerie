@@ -4,8 +4,8 @@ import sqlite3
 import json
 from datetime import datetime, timedelta
 import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from email.mime.text import MimeText
+from email.mime.multipart import MimeMultipart
 import os
 from functools import wraps
 import requests
@@ -141,12 +141,12 @@ def calculate_price(client_type, destination, pickup_address, bag_count):
 def send_email(to_email, subject, body):
     """Envoie un email de confirmation"""
     try:
-        msg = MIMEMultipart()
+        msg = MimeMultipart()
         msg['From'] = EMAIL_USER
         msg['To'] = to_email
         msg['Subject'] = subject
         
-        msg.attach(MIMEText(body, 'html'))
+        msg.attach(MimeText(body, 'html'))
         
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
@@ -379,4 +379,3 @@ if __name__ == '__main__':
     debug_mode = os.environ.get('FLASK_ENV') == 'development'
     
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
-  
