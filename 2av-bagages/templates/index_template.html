@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2AV-Bagages - Transport de bagages PACA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Header */
+        header {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ffa726;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text {
+            color: white;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #ffa726 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Booking Form */
+        .booking-form {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .booking-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        }
+
+        .form-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ffa726;
+            box-shadow: 0 0 20px rgba(255, 167, 38, 0.3);
+        }
+
+        .client-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .client-type {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .client-type:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .client-type.selected {
+            border-color: #ffa726;
+            background: rgba(255, 167, 38, 0.2);
+        }
+
+        .client-type .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .destinations {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .destination {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .destination:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .destination.selected {
+            border-color: #ffa726;
+            background: rgba(255, 167, 38, 0.2);
+        }
+
+        .destination .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 167, 38, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: #ffa726;
+            border-color: #ffa726;
+        }
+
+        .step.completed {
+            background: #4caf50;
+            border-color: #4caf50;
+        }
+
+        .pricing-preview {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: white;
+            text-align: center;
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffa726;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .services h2 {
+            color: white;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .service-card .icon {
+            font-size: 3rem;
+            color: #ffa726;
+            margin-bottom: 1rem;
+        }
+
+        .service-card h3 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .client-types {
+                grid-template-columns: 1fr;
+            }
+
+            .features {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <header>
+        <nav>
+            <a href="{{ url_for('index') }}" class="logo">2AV-Bagages</a>
+            <ul class="nav-links">
+                <li><a href="#accueil">Accueil</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="{{ url_for('admin_login') }}">Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero" id="accueil">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Transport de Bagages PACA</h1>
+                <p>Service professionnel de collecte et livraison de bagages vers les aéroports, gares et ports de la région Aix-Marseille-Provence. Fiable, rapide et sécurisé.</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <span>🚀</span>
+                        <span>Service 24h/24</span>
+                    </div>
+                    <div class="feature">
+                        <span>🔒</span>
+                        <span>Sécurisé</span>
+                    </div>
+                    <div class="feature">
+                        <span>💯</span>
+                        <span>Garantie</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <div style="color: white; opacity: 0.9;">
+                        <strong>📞 (+33) 6-63-49-70-64</strong><br>
+                        <strong>📧 2av.bagage@gmail.com</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="booking-form">
+                <h2 class="form-title">Réservation en ligne</h2>
+                
+                <div id="alertContainer"></div>
+                
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">1</div>
+                    <div class="step" data-step="2">2</div>
+                    <div class="step" data-step="3">3</div>
+                    <div class="step" data-step="4">4</div>
+                </div>
+
+                <form id="bookingForm">
+                    <!-- Étape 1: Type de client -->
+                    <div class="form-step active" data-step="1">
+                        <h3 style="color: white; margin-bottom: 1rem;">Quel type de client êtes-vous ?</h3>
+                        <div class="client-types">
+                            <div class="client-type" data-type="pmr">
+                                <span class="icon">♿</span>
+                                <div>PMR</div>
+                                <small>Prioritaire</small>
+                            </div>
+                            <div class="client-type" data-type="famille">
+                                <span class="icon">👨‍👩‍👧‍👦</span>
+                                <div>Famille</div>
+                                <small>Plusieurs bagages</small>
+                            </div>
+                            <div class="client-type" data-type="individuel">
+                                <span class="icon">🧳</span>
+                                <div>Individuel</div>
+                                <small>1-2 bagages</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Étape 2: Destination -->
+                    <div class="form-step" data-step="2">
+                        <h3 style="color: white; margin-bottom: 1rem;">Où souhaitez-vous transporter vos bagages ?</h3>
+                        <div class="destinations">
+                            <div class="destination" data-dest="aeroport">
+                                <span class="icon">✈️</span>
+                                <div>Aéroport</div>
+                                <small>Marseille Provence</small>
+                            </div>
+                            <div class="destination" data-dest="gare">
+                                <span class="icon">🚄</span>
+                                <div>Gare</div>
+                                <small>TGV / TER</small>
+                            </div>
+                            <div class="destination" data-dest="port">
+                                <span class="icon">🚢</span>
+                                <div>Port</div>
+                                <small>Marseille / Corsica</small>
+                            </div>
+                            <div class="destination" data-dest="domicile">
+                                <span class="icon">🏠</span>
+                                <div>Domicile</div>
+                                <small>Livraison directe</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Étape 3: Détails -->
+                    <div class="form-step" data-step="3">
+                        <h3 style="color: white; margin-bottom: 1rem;">Détails de votre réservation</h3>
+                        
+                        <div class="form-group">
+                            <label>Adresse de collecte</label>
+                            <input type="text" name="pickup_address" placeholder="Votre adresse..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Date et heure</label>
+                            <input type="datetime-local" name="pickup_datetime" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nombre de bagages</label>
+                            <select name="bag_count" required>
+                                <option value="">Sélectionnez...</option>
+                                <option value="1">1 bagage</option>
+                                <option value="2">2 bagages</option>
+                                <option value="3">3 bagages</option>
+                                <option value="4+">4 bagages ou plus</option>
+                            </select>
+                        </div>
+
+                        <div class="pricing-preview" id="pricingPreview" style="display: none;">
+                            <div>Estimation tarifaire</div>
+                            <div class="price" id="estimatedPrice">--€</div>
+                        </div>
+                    </div>
+
+                    <!-- Étape 4: Confirmation -->
+                    <div class="form-step" data-step="4">
+                        <h3 style="color: white; margin-bottom: 1rem;">Vos coordonnées</h3>
+                        
+                        <div class="form-group">
+                            <label>Nom complet</label>
+                            <input type="text" name="client_name" placeholder="Votre nom..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="client_email" placeholder="votre@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Téléphone</label>
+                            <input type="tel" name="client_phone" placeholder="06 XX XX XX XX" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Instructions spéciales (optionnel)</label>
+                            <input type="text" name="special_instructions" placeholder="Précisions sur l'adresse, bagages fragiles...">
+                        </div>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">Précédent</button>
+                        <button type="button" class="btn btn-primary" id="nextBtn">Suivant</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Confirmer la réservation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="services" id="services">
+        <h2>Nos Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="icon">🚗</div>
+                <h3>Collecte à domicile</h3>
+                <p>Nous venons récupérer vos bagages directement chez vous, dans toute la métropole Aix-Marseille-Provence.</p>
+            </div>
+            <div class="service-card">
+                <div class="icon">⚡</div>
+                <h3>Service express</h3>
+                <p>Livraison rapide vers tous les aéroports, gares et ports de la région. Service 24h/24 sur demande.</p>
+            </div>
+            <div class="service-card">
+                <div class="icon">🔒</div>
+                <h3>Transport sécurisé</h3>
+                <p>Vos bagages sont assurés et suivis pendant tout le transport. Véhicules équipés et chauffeurs professionnels.</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Animation des particules en arrière-plan
+        function createParticles() {
+            const container = document.getElementById('bgAnimation');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.width = particle.style.height = Math.random() * 10 + 5 + 'px';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Gestion du formulaire multi-étapes
+        let currentStep = 1;
+        const totalSteps = 4;
+        let formData = {};
+
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            
+            alertContainer.innerHTML = `
+                <div class="alert ${alertClass}">
+                    ${message}
+                </div>
+            `;
+            
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        function updateStepIndicator() {
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNumber = index + 1;
+                step.classList.remove('active', 'completed');
+                
+                if (stepNumber < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.form-step').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+            
+            // Gérer les boutons
+            document.getElementById('prevBtn').style.display = step > 1 ? 'block' : 'none';
+            document.getElementById('nextBtn').style.display = step < totalSteps ? 'block' : 'none';
+            document.getElementById('submitBtn').style.display = step === totalSteps ? 'block' : 'none';
+            
+            updateStepIndicator();
+        }
+
+        // Sélection des types de clients
+        document.querySelectorAll('.client-type').forEach(type => {
+            type.addEventListener('click', () => {
+                document.querySelectorAll('.client-type').forEach(t => t.classList.remove('selected'));
+                type.classList.add('selected');
+                formData.clientType = type.dataset.type;
+            });
+        });
+
+        // Sélection des destinations
+        document.querySelectorAll('.destination').forEach(dest => {
+            dest.addEventListener('click', () => {
+                document.querySelectorAll('.destination').forEach(d => d.classList.remove('selected'));
+                dest.classList.add('selected');
+                formData.destination = dest.dataset.dest;
+            });
+        });
+
+        // Navigation
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (validateCurrentStep()) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    showStep(currentStep);
+                    if (currentStep === 3) {
+                        updatePricing();
+                    }
+                }
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        function validateCurrentStep() {
+            if (currentStep === 1 && !formData.clientType) {
+                showAlert('Veuillez sélectionner votre type de client', 'error');
+                return false;
+            }
+            if (currentStep === 2 && !formData.destination) {
+                showAlert('Veuillez sélectionner une destination', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        async function updatePricing() {
+            try {
+                const response = await fetch('/calculate-price', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        client_type: formData.clientType,
+                        destination: formData.destination,
+                        pickup_address: document.querySelector('input[name="pickup_address"]').value,
+                        bag_count: document.querySelector('select[name="bag_count"]').value
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.price) {
+                    document.getElementById('estimatedPrice').textContent = data.price + '€';
+                    document.getElementById('pricingPreview').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erreur calcul prix:', error);
+            }
+        }
+
+        // Soumission du formulaire
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Traitement...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Collecter toutes les données
+                const formElement = e.target;
+                const data = new FormData(formElement);
+                
+                // Créer l'objet de données
+                const bookingData = {
+                    client_type: formData.clientType,
+                    destination: formData.destination,
+                    pickup_address: data.get('pickup_address'),
+                    pickup_datetime: data.get('pickup_datetime'),
+                    bag_count: data.get('bag_count'),
+                    client_name: data.get('client_name'),
+                    client_email: data.get('client_email'),
+                    client_phone: data.get('client_phone'),
+                    special_instructions: data.get('special_instructions') || ''
+                };
+                
+                // Envoyer au backend
+                const response = await fetch('/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(`Réservation confirmée ! N° ${result.booking_id}. Vous recevrez une confirmation par email.`, 'success');
+                    // Réinitialiser le formulaire
+                    document.getElementById('bookingForm').reset();
+                    currentStep = 1;
+                    showStep(1);
+                    formData = {};
+                    document.querySelectorAll('.client-type, .destination').forEach(el => el.classList.remove('selected'));
+                } else {
+                    showAlert(result.message || 'Erreur lors de la réservation', 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Erreur de connexion. Veuillez réessayer.', 'error');
+                console.error('Erreur:', error);
+            } finally {
+                submitBtn.textContent = 'Confirmer la réservation';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Mise à jour du prix en temps réel
+        document.querySelector('select[name="bag_count"]').addEventListener('change', updatePricing);
+        document.querySelector('input[name="pickup_address"]').addEventListener('blur', updatePricing);
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            showStep(1);
+            
+            // Mettre la date minimum à aujourd'hui
+            const dateInput = document.querySelector('input[type="datetime-local"]');
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            dateInput.min = now.toISOString().slice(0, 16);
+        });
+
+        // Smooth scroll pour la navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
