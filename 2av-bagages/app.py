@@ -141,7 +141,7 @@ def calculate_price(client_type, destination, pickup_address, bag_count):
 def send_email(to_email, subject, body):
     """Envoie un email de confirmation"""
     try:
-        msg = MimeMultipart()
+        msg = MIMEMultipart()
         msg['From'] = EMAIL_USER
         msg['To'] = to_email
         msg['Subject'] = subject
