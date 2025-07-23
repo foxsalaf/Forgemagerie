@@ -4,7 +4,7 @@ import sqlite3
 import json
 from datetime import datetime, timedelta
 import smtplib
-from email.mime.text import MimeText
+from email.mime.text import MIMEText
 from email.mime.multipart import MimeMultipart
 import os
 from functools import wraps
