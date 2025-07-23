@@ -3,9 +3,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import json
 from datetime import datetime, timedelta
-import smtplib
-from email.mime.text import MimeText
-from email.mime.multipart import MimeMultipart
 import os
 from functools import wraps
 import requests
@@ -82,6 +79,7 @@ def init_db():
     
     conn.commit()
     conn.close()
+    print("✅ Base de données initialisée")
 
 # Décorateur pour l'authentification admin
 def admin_required(f):
@@ -137,26 +135,18 @@ def calculate_price(client_type, destination, pickup_address, bag_count):
     
     return round(total_price, 2)
 
-# Envoi d'email
-def send_email(to_email, subject, body):
-    """Envoie un email de confirmation"""
+# Envoi d'email (version simple sans SMTP pour éviter les problèmes d'import)
+def send_email_notification(to_email, subject, booking_details):
+    """Log email au lieu de l'envoyer (temporaire)"""
     try:
-        msg = MimeMultipart()
-        msg['From'] = EMAIL_USER
-        msg['To'] = to_email
-        msg['Subject'] = subject
-        
-        msg.attach(MimeText(body, 'html'))
-        
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(EMAIL_USER, EMAIL_PASS)
-        text = msg.as_string()
-        server.sendmail(EMAIL_USER, to_email, text)
-        server.quit()
+        print(f"📧 EMAIL À ENVOYER:")
+        print(f"To: {to_email}")
+        print(f"Subject: {subject}")
+        print(f"Booking: {booking_details}")
+        print("✅ Email logged (pas encore envoyé)")
         return True
     except Exception as e:
-        print(f"Erreur envoi email: {e}")
+        print(f"❌ Erreur email: {e}")
         return False
 
 # Routes principales
@@ -169,6 +159,16 @@ def book():
     """Traite une nouvelle réservation"""
     try:
         data = request.get_json()
+        print(f"📦 Nouvelle réservation: {data}")
+        
+        # Validation des données
+        if not data:
+            return jsonify({'success': False, 'message': 'Aucune donnée reçue'}), 400
+        
+        required_fields = ['client_type', 'destination', 'pickup_address', 'client_name', 'client_email', 'client_phone']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'success': False, 'message': f'Champ {field} requis'}), 400
         
         # Calculer le prix
         estimated_price = calculate_price(
@@ -205,30 +205,14 @@ def book():
         conn.commit()
         conn.close()
         
-        # Envoyer email de confirmation
-        email_body = f"""
-        <h2>Confirmation de réservation - 2AV Bagages</h2>
-        <p>Bonjour {data['client_name']},</p>
-        <p>Votre réservation a été confirmée avec succès !</p>
+        print(f"✅ Réservation #{booking_id} créée")
         
-        <h3>Détails de votre réservation :</h3>
-        <ul>
-            <li><strong>N° de réservation :</strong> #{booking_id}</li>
-            <li><strong>Type de client :</strong> {data['client_type'].title()}</li>
-            <li><strong>Destination :</strong> {data['destination'].title()}</li>
-            <li><strong>Adresse de collecte :</strong> {data['pickup_address']}</li>
-            <li><strong>Date et heure :</strong> {data['pickup_datetime']}</li>
-            <li><strong>Nombre de bagages :</strong> {data['bag_count']}</li>
-            <li><strong>Prix estimé :</strong> {estimated_price}€</li>
-        </ul>
-        
-        <p>Nous vous contacterons 30 minutes avant l'heure de collecte.</p>
-        <p>Pour toute question : (+33) 6-63-49-70-64</p>
-        
-        <p>Cordialement,<br>L'équipe 2AV Bagages</p>
-        """
-        
-        send_email(data['client_email'], 'Confirmation de réservation 2AV-Bagages', email_body)
+        # Notification email (log pour l'instant)
+        send_email_notification(
+            data['client_email'], 
+            f'Confirmation réservation 2AV-Bagages #{booking_id}',
+            data
+        )
         
         return jsonify({
             'success': True,
@@ -238,6 +222,7 @@ def book():
         })
         
     except Exception as e:
+        print(f"❌ Erreur réservation: {e}")
         return jsonify({
             'success': False,
             'message': f'Erreur lors de la réservation: {str(e)}'
@@ -348,6 +333,16 @@ def update_booking_status(booking_id):
     flash(f'Statut mis à jour vers: {new_status}', 'success')
     return redirect(url_for('admin_bookings'))
 
+# Route de test
+@app.route('/test')
+def test():
+    return """
+    <h1>🎉 2AV-Bagages Test</h1>
+    <p>✅ Flask fonctionne !</p>
+    <p>✅ Pas d'erreur d'import !</p>
+    <a href="/">← Retour à l'accueil</a>
+    """
+
 # API Routes
 @app.route('/api/bookings', methods=['GET'])
 @admin_required
@@ -359,7 +354,10 @@ def api_bookings():
     bookings = cursor.fetchall()
     conn.close()
     
-    return jsonify([dict(zip([col[0] for col in cursor.description], booking)) for booking in bookings])
+    columns = [description[0] for description in cursor.description]
+    bookings_list = [dict(zip(columns, booking)) for booking in bookings]
+    
+    return jsonify(bookings_list)
 
 # Templates par défaut si pas de dossier templates
 @app.errorhandler(404)
@@ -369,7 +367,16 @@ def not_found(error):
     <p><a href="/">Retour à l'accueil</a></p>
     """, 404
 
+@app.errorhandler(500)
+def internal_error(error):
+    return """
+    <h1>500 - Erreur serveur</h1>
+    <p>Une erreur s'est produite.</p>
+    <p><a href="/">Retour à l'accueil</a></p>
+    """, 500
+
 if __name__ == '__main__':
+    print("🚀 Démarrage 2AV-Bagages...")
     init_db()
     
     # Port pour Railway (ou 5000 en local)
@@ -378,4 +385,6 @@ if __name__ == '__main__':
     # Mode debug uniquement en local
     debug_mode = os.environ.get('FLASK_ENV') == 'development'
     
+    print(f"🌐 Serveur démarré sur port {port}")
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
+    
