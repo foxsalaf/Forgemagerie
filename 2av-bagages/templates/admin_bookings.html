@@ -1,571 +1,152 @@
 {% extends "base.html" %}
 
-{% block title %}Gestion des réservations - 2AV Bagages{% endblock %}
+{% block title %}Réservations - 2AV-Bagages{% endblock %}
 
 {% block extra_css %}
 <style>
-    .filters {
+    .admin-header {
         background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .filters-row {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .filter-group label {
-        font-weight: 600;
-        color: #374151;
-        font-size: 0.875rem;
-    }
-
-    .filter-group select {
-        padding: 0.5rem;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 0.875rem;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .stat-card {
-        background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        border-left: 4px solid #3b82f6;
-    }
-
-    .stat-card.warning {
-        border-left-color: #f59e0b;
-    }
-
-    .stat-card.success {
-        border-left-color: #10b981;
-    }
-
-    .stat-card.danger {
-        border-left-color: #ef4444;
-    }
-
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1f2937;
-    }
-
-    .stat-label {
-        color: #6b7280;
-        font-size: 0.875rem;
-        margin-top: 0.5rem;
-    }
-
-    .booking-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-    .booking-card:hover {
-        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-        transform: translateY(-2px);
-    }
-
-    .booking-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
-
-    .booking-id {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #1f2937;
-    }
-
-    .booking-date {
-        color: #6b7280;
-        font-size: 0.875rem;
-    }
-
-    .booking-content {
-        padding: 1.5rem;
-    }
-
-    .booking-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .booking-field {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .booking-field-label {
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #6b7280;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .booking-field-value {
-        font-weight: 500;
-        color: #1f2937;
-    }
-
-    .booking-actions {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        padding-top: 1rem;
-        border-top: 1px solid #e5e7eb;
-    }
-
-    .status-form {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-    }
-
-    .client-type-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    .client-type-pmr {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .client-type-famille {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-
-    .client-type-individuel {
-        background: #d1fae5;
-        color: #065f46;
-    }
-
-    .destination-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        background: #f3f4f6;
-        color: #374151;
-    }
-
-    .price-display {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #059669;
-    }
-
-    .contact-info {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .contact-info a {
-        color: #3b82f6;
+    .nav-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
         text-decoration: none;
+        margin-left: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
-
-    .contact-info a:hover {
-        text-decoration: underline;
+    .nav-btn.danger { background: #e74c3c; }
+    .filter-buttons {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
     }
-
-    .search-box {
+    .filter-btn {
+        padding: 8px 16px;
+        border: 2px solid #667eea;
+        background: {% if status_filter == 'all' %}#667eea{% else %}transparent{% endif %};
+        color: {% if status_filter == 'all' %}white{% else %}#667eea{% endif %};
+        border-radius: 20px;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    table {
         width: 100%;
-        max-width: 300px;
-        padding: 0.75rem;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 1rem;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
-
-    .toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-        gap: 1rem;
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
     }
-
-    .toolbar-left {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-    }
-
-    .booking-count {
-        color: #6b7280;
-        font-size: 0.875rem;
-    }
-
-    @media (max-width: 768px) {
-        .booking-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .filters-row {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .toolbar {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .booking-actions {
-            flex-direction: column;
-            align-items: stretch;
-        }
+    th {
+        background: #f8f9fa;
+        font-weight: 600;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1><i class="fas fa-calendar-check"></i> Gestion des réservations</h1>
-        <div>
-            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
-            </a>
-            <a href="{{ url_for('admin_logout') }}" class="btn btn-secondary">
-                <i class="fas fa-sign-out-alt"></i> Déconnexion
-            </a>
-        </div>
-    </div>
-
-    <!-- Statistiques rapides -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-number">{{ bookings|length }}</div>
-            <div class="stat-label">Total réservations</div>
-        </div>
-        
-        <div class="stat-card warning">
-            <div class="stat-number">
-                {{ bookings|selectattr("11", "equalto", "pending")|list|length }}
-            </div>
-            <div class="stat-label">En attente</div>
-        </div>
-        
-        <div class="stat-card success">
-            <div class="stat-number">
-                {{ bookings|selectattr("11", "equalto", "completed")|list|length }}
-            </div>
-            <div class="stat-label">Terminées</div>
-        </div>
-        
-        <div class="stat-card danger">
-            <div class="stat-number">
-                {{ bookings|selectattr("11", "equalto", "cancelled")|list|length }}
-            </div>
-            <div class="stat-label">Annulées</div>
-        </div>
-    </div>
-
-    <!-- Filtres -->
-    <div class="filters">
-        <h3 style="margin-bottom: 1rem;"><i class="fas fa-filter"></i> Filtres et recherche</h3>
-        <form method="GET" action="{{ url_for('admin_bookings') }}">
-            <div class="filters-row">
-                <div class="filter-group">
-                    <label>Statut</label>
-                    <select name="status" onchange="this.form.submit()">
-                        <option value="all" {{ 'selected' if status_filter == 'all' else '' }}>Tous</option>
-                        <option value="pending" {{ 'selected' if status_filter == 'pending' else '' }}>En attente</option>
-                        <option value="confirmed" {{ 'selected' if status_filter == 'confirmed' else '' }}>Confirmées</option>
-                        <option value="completed" {{ 'selected' if status_filter == 'completed' else '' }}>Terminées</option>
-                        <option value="cancelled" {{ 'selected' if status_filter == 'cancelled' else '' }}>Annulées</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label>Recherche</label>
-                    <input type="text" 
-                           class="search-box" 
-                           placeholder="Nom, email, téléphone..."
-                           id="searchInput"
-                           onkeyup="filterBookings()">
-                </div>
-                
-                <div class="filter-group">
-                    <label>&nbsp;</label>
-                    <button type="button" class="btn btn-secondary" onclick="exportBookings()">
-                        <i class="fas fa-download"></i> Exporter
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <!-- Toolbar -->
-    <div class="toolbar">
-        <div class="toolbar-left">
-            <div class="booking-count">
-                <strong>{{ bookings|length }}</strong> réservation(s) trouvée(s)
-            </div>
-        </div>
-    </div>
-
-    <!-- Liste des réservations -->
-    <div id="bookingsContainer">
-        {% if bookings %}
-            {% for booking in bookings %}
-            <div class="booking-card" data-booking-id="{{ booking[0] }}">
-                <div class="booking-header">
-                    <div>
-                        <div class="booking-id">#{{ booking[0] }}</div>
-                        <div class="booking-date">{{ booking[12] }}</div>
-                    </div>
-                    <div>
-                        <span class="status-badge status-{{ booking[11] }}">
-                            {{ booking[11]|title }}
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="booking-content">
-                    <div class="booking-grid">
-                        <div class="booking-field">
-                            <div class="booking-field-label">Client</div>
-                            <div class="booking-field-value">
-                                <strong>{{ booking[6] }}</strong>
-                                <div class="contact-info">
-                                    <a href="mailto:{{ booking[7] }}">{{ booking[7] }}</a>
-                                    <a href="tel:{{ booking[8] }}">{{ booking[8] }}</a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="booking-field">
-                            <div class="booking-field-label">Type de client</div>
-                            <div class="booking-field-value">
-                                <span class="client-type-badge client-type-{{ booking[1] }}">
-                                    {{ booking[1]|title }}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="booking-field">
-                            <div class="booking-field-label">Destination</div>
-                            <div class="booking-field-value">
-                                <span class="destination-badge">
-                                    {{ booking[2]|title }}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="booking-field">
-                            <div class="booking-field-label">Collecte</div>
-                            <div class="booking-field-value">
-                                <div>{{ booking[3] }}</div>
-                                <small style="color: #6b7280;">{{ booking[4] }}</small>
-                            </div>
-                        </div>
-                        
-                        <div class="booking-field">
-                            <div class="booking-field-label">Bagages</div>
-                            <div class="booking-field-value">{{ booking[5] }}</div>
-                        </div>
-                        
-                        <div class="booking-field">
-                            <div class="booking-field-label">Prix estimé</div>
-                            <div class="booking-field-value">
-                                <span class="price-display">{{ "%.2f"|format(booking[10]) }}€</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {% if booking[9] %}
-                    <div class="booking-field" style="margin-bottom: 1rem;">
-                        <div class="booking-field-label">Instructions spéciales</div>
-                        <div class="booking-field-value">{{ booking[9] }}</div>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="booking-actions">
-                        <form method="POST" action="{{ url_for('update_booking_status', booking_id=booking[0]) }}" class="status-form">
-                            <label style="font-weight: 600; margin-right: 0.5rem;">Changer le statut :</label>
-                            <select name="status" required>
-                                <option value="pending" {{ 'selected' if booking[11] == 'pending' else '' }}>En attente</option>
-                                <option value="confirmed" {{ 'selected' if booking[11] == 'confirmed' else '' }}>Confirmée</option>
-                                <option value="in_progress" {{ 'selected' if booking[11] == 'in_progress' else '' }}>En cours</option>
-                                <option value="completed" {{ 'selected' if booking[11] == 'completed' else '' }}>Terminée</option>
-                                <option value="cancelled" {{ 'selected' if booking[11] == 'cancelled' else '' }}>Annulée</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Mettre à jour
-                            </button>
-                        </form>
-                        
-                        <div style="margin-left: auto;">
-                            <button class="btn btn-secondary" onclick="callClient('{{ booking[8] }}')">
-                                <i class="fas fa-phone"></i> Appeler
-                            </button>
-                            <button class="btn btn-secondary" onclick="emailClient('{{ booking[7] }}')">
-                                <i class="fas fa-envelope"></i> Email
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="card" style="text-align: center; padding: 3rem;">
-                <div style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;">
-                    <i class="fas fa-inbox"></i>
-                </div>
-                <h3 style="color: #6b7280; margin-bottom: 1rem;">Aucune réservation trouvée</h3>
-                <p style="color: #9ca3af;">
-                    {% if status_filter != 'all' %}
-                        Aucune réservation avec le statut "{{ status_filter }}".
-                    {% else %}
-                        Aucune réservation n'a encore été effectuée.
-                    {% endif %}
-                </p>
-                <a href="{{ url_for('admin_bookings') }}?status=all" class="btn btn-primary" style="margin-top: 1rem;">
-                    Voir toutes les réservations
-                </a>
-            </div>
-        {% endif %}
+<div class="admin-header">
+    <h1>
+        <i class="fas fa-list"></i>
+        Gestion des Réservations
+    </h1>
+    <div>
+        <a href="{{ url_for('admin_dashboard') }}" class="nav-btn">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="nav-btn danger">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
     </div>
 </div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
-            {% for category, message in messages %}
-                <div style="background: {% if category == 'success' %}#10b981{% else %}#ef4444{% endif %}; color: white; padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endwith %}
+<div class="container">
+    <div class="filter-buttons">
+        <a href="{{ url_for('admin_bookings', status='all') }}" 
+           class="filter-btn {% if status_filter == 'all' %}active{% endif %}">
+            Toutes
+        </a>
+        <a href="{{ url_for('admin_bookings', status='pending') }}" 
+           class="filter-btn {% if status_filter == 'pending' %}active{% endif %}">
+            En Attente
+        </a>
+        <a href="{{ url_for('admin_bookings', status='confirmed') }}" 
+           class="filter-btn {% if status_filter == 'confirmed' %}active{% endif %}">
+            Confirmées
+        </a>
+        <a href="{{ url_for('admin_bookings', status='completed') }}" 
+           class="filter-btn {% if status_filter == 'completed' %}active{% endif %}">
+            Terminées
+        </a>
+    </div>
 
-<script>
-    // Recherche en temps réel
-    function filterBookings() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const bookingCards = document.querySelectorAll('.booking-card');
-        
-        bookingCards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-        
-        // Mettre à jour le compteur
-        const visibleBookings = Array.from(bookingCards).filter(card => card.style.display !== 'none').length;
-        document.querySelector('.booking-count').innerHTML = `<strong>${visibleBookings}</strong> réservation(s) trouvée(s)`;
-    }
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Type</th>
+                <th>Destination</th>
+                <th>Adresse</th>
+                <th>Date/Heure</th>
+                <th>Bagages</th>
+                <th>Prix</th>
+                <th>Statut</th>
+                <th>Créé le</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>#{{ booking.id }}</td>
+                <td>{{ booking.client_name }}</td>
+                <td>{{ booking.client_email }}</td>
+                <td>{{ booking.client_phone }}</td>
+                <td>{{ booking.client_type }}</td>
+                <td>{{ booking.destination }}</td>
+                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
+                    {{ booking.pickup_address }}
+                </td>
+                <td>{{ booking.pickup_datetime }}</td>
+                <td>{{ booking.bag_count }}</td>
+                <td>{{ "%.2f"|format(booking.estimated_price) }}€</td>
+                <td>
+                    <span style="padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; 
+                          background: {% if booking.status == 'pending' %}#fff3cd; color: #856404;
+                                    {% elif booking.status == 'confirmed' %}#d4edda; color: #155724;
+                                    {% elif booking.status == 'completed' %}#cce5ff; color: #004085;
+                                    {% else %}#f8d7da; color: #721c24;{% endif %}">
+                        {{ booking.status }}
+                    </span>
+                </td>
+                <td>{{ booking.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     
-    // Actions rapides
-    function callClient(phone) {
-        window.open(`tel:${phone}`);
-    }
-    
-    function emailClient(email) {
-        window.open(`mailto:${email}`);
-    }
-    
-    // Export des données
-    function exportBookings() {
-        // Collecter les données visibles
-        const bookings = [];
-        const visibleCards = document.querySelectorAll('.booking-card:not([style*="display: none"])');
-        
-        visibleCards.forEach(card => {
-            const id = card.dataset.bookingId;
-            // Ici on pourrait faire un appel AJAX pour récupérer les données complètes
-            bookings.push(id);
-        });
-        
-        if (bookings.length === 0) {
-            alert('Aucune réservation à exporter');
-            return;
-        }
-        
-        // Simuler l'export (en production, faire un appel vers une route Flask)
-        const csvContent = "data:text/csv;charset=utf-8," + 
-            "ID,Client,Email,Téléphone,Type,Destination,Statut,Prix\n" +
-            "Simulation d'export...";
-        
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `reservations_2av_${new Date().toISOString().split('T')[0]}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-    
-    // Auto-actualisation
-    function setupAutoRefresh() {
-        // Rafraîchir toutes les 30 secondes
-        setInterval(() => {
-            if (document.querySelector('select[name="status"]').value === 'pending') {
-                location.reload();
-            }
-        }, 30000);
-    }
-    
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', () => {
-        setupAutoRefresh();
-        
-        // Masquer automatiquement les messages flash après 5 secondes
-        setTimeout(() => {
-            const messages = document.querySelectorAll('[style*="position: fixed"]');
-            messages.forEach(msg => {
-                msg.style.opacity = '0';
-                msg.style.transform = 'translateX(100%)';
-                setTimeout(() => msg.remove(), 300);
-            });
-        }, 5000);
-    });
-</script>
+    {% if not bookings %}
+    <div style="text-align: center; padding: 40px; color: #666;">
+        <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 20px;"></i>
+        <p>Aucune réservation trouvée pour ce filtre.</p>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
