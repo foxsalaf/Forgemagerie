@@ -1,152 +1,88 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Réservations - 2AV-Bagages</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block title %}Réservations - 2AV-Bagages{% endblock %}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
 
-{% block extra_css %}
-<style>
-    .admin-header {
-        background: white;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .nav-btn {
-        background: #667eea;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        margin-left: 10px;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .nav-btn.danger { background: #e74c3c; }
-    .filter-buttons {
-        margin-bottom: 20px;
-        display: flex;
-        gap: 10px;
-    }
-    .filter-btn {
-        padding: 8px 16px;
-        border: 2px solid #667eea;
-        background: {% if status_filter == 'all' %}#667eea{% else %}transparent{% endif %};
-        color: {% if status_filter == 'all' %}white{% else %}#667eea{% endif %};
-        border-radius: 20px;
-        text-decoration: none;
-        transition: all 0.3s;
-    }
-    table {
-        width: 100%;
-        background: white;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    th, td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #eee;
-    }
-    th {
-        background: #f8f9fa;
-        font-weight: 600;
-    }
-</style>
-{% endblock %}
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
 
-{% block content %}
-<div class="admin-header">
-    <h1>
-        <i class="fas fa-list"></i>
-        Gestion des Réservations
-    </h1>
-    <div>
-        <a href="{{ url_for('admin_dashboard') }}" class="nav-btn">
-            <i class="fas fa-tachometer-alt"></i> Dashboard
-        </a>
-        <a href="{{ url_for('admin_logout') }}" class="nav-btn danger">
-            <i class="fas fa-sign-out-alt"></i> Déconnexion
-        </a>
-    </div>
-</div>
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-<div class="container">
-    <div class="filter-buttons">
-        <a href="{{ url_for('admin_bookings', status='all') }}" 
-           class="filter-btn {% if status_filter == 'all' %}active{% endif %}">
-            Toutes
-        </a>
-        <a href="{{ url_for('admin_bookings', status='pending') }}" 
-           class="filter-btn {% if status_filter == 'pending' %}active{% endif %}">
-            En Attente
-        </a>
-        <a href="{{ url_for('admin_bookings', status='confirmed') }}" 
-           class="filter-btn {% if status_filter == 'confirmed' %}active{% endif %}">
-            Confirmées
-        </a>
-        <a href="{{ url_for('admin_bookings', status='completed') }}" 
-           class="filter-btn {% if status_filter == 'completed' %}active{% endif %}">
-            Terminées
-        </a>
-    </div>
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Client</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Type</th>
-                <th>Destination</th>
-                <th>Adresse</th>
-                <th>Date/Heure</th>
-                <th>Bagages</th>
-                <th>Prix</th>
-                <th>Statut</th>
-                <th>Créé le</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for booking in bookings %}
-            <tr>
-                <td>#{{ booking.id }}</td>
-                <td>{{ booking.client_name }}</td>
-                <td>{{ booking.client_email }}</td>
-                <td>{{ booking.client_phone }}</td>
-                <td>{{ booking.client_type }}</td>
-                <td>{{ booking.destination }}</td>
-                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
-                    {{ booking.pickup_address }}
-                </td>
-                <td>{{ booking.pickup_datetime }}</td>
-                <td>{{ booking.bag_count }}</td>
-                <td>{{ "%.2f"|format(booking.estimated_price) }}€</td>
-                <td>
-                    <span style="padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; 
-                          background: {% if booking.status == 'pending' %}#fff3cd; color: #856404;
-                                    {% elif booking.status == 'confirmed' %}#d4edda; color: #155724;
-                                    {% elif booking.status == 'completed' %}#cce5ff; color: #004085;
-                                    {% else %}#f8d7da; color: #721c24;{% endif %}">
-                        {{ booking.status }}
-                    </span>
-                </td>
-                <td>{{ booking.created_at }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    {% if not bookings %}
-    <div style="text-align: center; padding: 40px; color: #666;">
-        <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 20px;"></i>
-        <p>Aucune réservation trouvée pour ce filtre.</p>
-    </div>
-    {% endif %}
-</div>
-{% endblock %}
+        .header-title i {
+            font-size: 2rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.danger {
+            background: rgba(231, 76, 60, 0.8);
+        }
+
+        .nav-btn.danger:hover {
+            background: rgba(231, 76, 60, 1);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
