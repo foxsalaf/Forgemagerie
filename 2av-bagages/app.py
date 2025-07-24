@@ -412,7 +412,57 @@ def internal_error(error):
     <p>Une erreur s'est produite.</p>
     <p><a href="/">Retour à l'accueil</a></p>
     """, 500
+# Ajoutez cette route à votre app.py existant, juste avant "if __name__ == '__main__':"
 
+@app.route('/admin/update-status/<int:booking_id>', methods=['POST'])
+@admin_required
+def update_booking_status(booking_id):
+    """Met à jour le statut d'une réservation"""
+    try:
+        data = request.get_json()
+        new_status = data.get('status')
+        
+        if new_status not in ['pending', 'confirmed', 'completed', 'cancelled']:
+            return jsonify({'success': False, 'message': 'Statut invalide'}), 400
+        
+        conn, db_type = get_db_connection()
+        cursor = conn.cursor()
+        
+        if db_type == 'postgresql':
+            cursor.execute('''
+                UPDATE bookings 
+                SET status = %s, updated_at = CURRENT_TIMESTAMP 
+                WHERE id = %s
+            ''', (new_status, booking_id))
+        else:
+            cursor.execute('''
+                UPDATE bookings 
+                SET status = ?, updated_at = CURRENT_TIMESTAMP 
+                WHERE id = ?
+            ''', (new_status, booking_id))
+        
+        if cursor.rowcount == 0:
+            return jsonify({'success': False, 'message': 'Réservation non trouvée'}), 404
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        print(f"✅ Statut mis à jour: Réservation #{booking_id} -> {new_status}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Statut mis à jour vers {new_status}',
+            'booking_id': booking_id,
+            'new_status': new_status
+        })
+        
+    except Exception as e:
+        print(f"❌ Erreur update statut: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Erreur lors de la mise à jour: {str(e)}'
+        }), 500
 if __name__ == '__main__':
     print("🚀 Démarrage 2AV-Bagages...")
     print(f"🗄️ Base de données: {os.environ.get('DATABASE_URL', 'SQLite local')}")
