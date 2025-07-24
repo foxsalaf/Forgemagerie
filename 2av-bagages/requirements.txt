@@ -14,16 +14,9 @@ gunicorn==21.2.0
 requests==2.31.0
 python-dotenv==1.0.0
 python-dateutil==2.8.2
-pytz==2023.3
 
 # Base de données
-sqlite-utils==3.38
-
-# APIs externes (optionnel - pour v2.0)
-googlemaps==4.10.0
-stripe==7.8.0
-twilio==8.10.0
+psycopg2-binary==2.9.7
 
 # Sécurité et validation
 email-validator==2.1.0
-
