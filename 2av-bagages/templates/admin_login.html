@@ -1,195 +1,241 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion Admin - 2AV-Bagages</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+{% block title %}Connexion Admin - 2AV-Bagages{% endblock %}
 
-        .login-container {
-            background: white;
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            animation: slideUp 0.6s ease-out;
-        }
+{% block extra_css %}
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+    .login-container {
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .login-box {
+        background: white;
+        padding: 50px;
+        border-radius: 25px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        text-align: center;
+        border-top: 5px solid #FF8C42;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .login-logo {
+        background: linear-gradient(45deg, #FF8C42, #FFA500);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        font-size: 2.5rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(255, 140, 66, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .login-title {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .login-subtitle {
+        color: #666;
+        margin-bottom: 40px;
+        font-size: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #E0F6FF;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #FAFFFE;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #FF8C42;
+        box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.1);
+        background: white;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(45deg, #FF8C42, #FFA500);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(255, 140, 66, 0.4);
+    }
+
+    .btn-login:active {
+        transform: translateY(0);
+    }
+
+    .back-link {
+        margin-top: 25px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #87CEEB;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 10px 20px;
+        border-radius: 25px;
+        background: rgba(135, 206, 235, 0.1);
+    }
+
+    .back-link:hover {
+        color: #5a9fd8;
+        background: rgba(135, 206, 235, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .login-features {
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 2px solid #E0F6FF;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background 0.3s ease;
+    }
+
+    .feature-item:hover {
+        background: rgba(135, 206, 235, 0.05);
+    }
+
+    .feature-icon {
+        color: #51CF66;
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Animation pour les erreurs */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    .alert-error {
+        animation: shake 0.5s ease-in-out;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 480px) {
+        .login-box {
+            padding: 30px 25px;
+            margin: 10px;
         }
 
         .login-logo {
-            font-size: 4rem;
-            color: #667eea;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
+            width: 60px;
+            height: 60px;
+            font-size: 2rem;
         }
 
         .login-title {
-            color: #333;
-            margin-bottom: 40px;
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.5rem;
         }
 
         .form-control {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            background: #fafafa;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            padding: 12px 15px;
         }
 
         .btn-login {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        .alert {
             padding: 15px;
-            margin-bottom: 25px;
-            border-radius: 10px;
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            animation: shake 0.5s ease-in-out;
+            font-size: 1rem;
         }
+    }
+</style>
+{% endblock %}
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .back-link {
-            margin-top: 25px;
-            display: block;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .back-link:hover {
-            color: #5a6fd8;
-        }
-
-        .back-link i {
-            margin-right: 8px;
-        }
-
-        .login-features {
-            margin-top: 30px;
-            padding-top: 25px;
-            border-top: 1px solid #eee;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            gap: 10px;
-        }
-
-        .feature-icon {
-            color: #27ae60;
-            font-size: 1.1rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
         <div class="login-logo">
             <i class="fas fa-suitcase-rolling"></i>
         </div>
-        <h2 class="login-title">Administration 2AV-Bagages</h2>
+        
+        <h2 class="login-title">Administration</h2>
+        <p class="login-subtitle">2AV-Bagages Métropole</p>
         
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert">
+                    <div class="alert alert-error">
                         <i class="fas fa-exclamation-triangle"></i>
                         {{ message }}
                     </div>
@@ -202,14 +248,16 @@
                 <label for="username">
                     <i class="fas fa-user"></i> Nom d'utilisateur
                 </label>
-                <input type="text" id="username" name="username" class="form-control" required autofocus>
+                <input type="text" id="username" name="username" class="form-control" 
+                       required autofocus placeholder="Entrez votre nom d'utilisateur">
             </div>
             
             <div class="form-group">
                 <label for="password">
                     <i class="fas fa-lock"></i> Mot de passe
                 </label>
-                <input type="password" id="password" name="password" class="form-control" required>
+                <input type="password" id="password" name="password" class="form-control" 
+                       required placeholder="Entrez votre mot de passe">
             </div>
             
             <button type="submit" class="btn-login">
@@ -236,7 +284,11 @@
                 <i class="fas fa-euro-sign feature-icon"></i>
                 <span>Suivi des revenus et paiements</span>
             </div>
+            <div class="feature-item">
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <span>Interface sécurisée et intuitive</span>
+            </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
