@@ -23,6 +23,7 @@ if not ADMIN_PASSWORD_HASH:
 def get_db_connection():
     """Connexion adaptative SQLite ou PostgreSQL"""
     database_url = os.environ.get('DATABASE_URL')
+    print(f"🔍 DATABASE_URL utilisé : {database_url}")
     if database_url and 'postgresql' in database_url:
         # PostgreSQL (ex: sur Railway)
         import psycopg2
