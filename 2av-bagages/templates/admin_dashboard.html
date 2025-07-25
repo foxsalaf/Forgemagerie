@@ -4,92 +4,379 @@
 
 {% block extra_css %}
 <style>
-    .admin-header {
-        background: white;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-bottom: 40px;
-    }
-    .stat-card {
+    /* Styles spécifiques au dashboard */
+    .welcome-banner {
         background: white;
         padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        text-align: center;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        border-left: 5px solid #FF8C42;
+        display: flex;
+        align-items: center;
+        gap: 20px;
     }
+
+    .welcome-icon {
+        background: linear-gradient(45deg, #FF8C42, #FFA500);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 5px 15px rgba(255, 140, 66, 0.3);
+    }
+
+    .welcome-text h2 {
+        color: #333;
+        margin-bottom: 5px;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .welcome-text p {
+        color: #666;
+        font-size: 1rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 35px 25px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(45deg, #FF8C42, #FFA500);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.2s; }
+    .stat-card:nth-child(4) { animation-delay: 0.3s; }
+
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2rem;
+        color: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .stat-icon.blue {
+        background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+    }
+
+    .stat-icon.orange {
+        background: linear-gradient(45deg, #FF8C42, #FFA500);
+    }
+
+    .stat-icon.green {
+        background: linear-gradient(45deg, #51CF66, #69DB7C);
+    }
+
+    .stat-icon.purple {
+        background: linear-gradient(45deg, #9775FA, #B197FC);
+    }
+
     .stat-number {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: bold;
         color: #333;
         margin-bottom: 10px;
+        line-height: 1;
     }
+
     .stat-label {
         color: #666;
         font-size: 1.1rem;
+        font-weight: 500;
     }
-    .nav-btn {
-        background: #667eea;
+
+    .recent-bookings-section {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        border-top: 4px solid #87CEEB;
+    }
+
+    .section-header {
+        padding: 25px 35px;
+        border-bottom: 2px solid #E0F6FF;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .section-icon {
+        background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        font-size: 1.2rem;
+    }
+
+    .section-title {
+        color: #333;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .bookings-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    .bookings-table th {
+        background: linear-gradient(45deg, #F8FDFF, #E0F6FF);
+        text-align: left;
+        padding: 18px 20px;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #87CEEB;
+        font-size: 0.95rem;
+    }
+
+    .bookings-table td {
+        text-align: left;
+        padding: 18px 20px;
+        border-bottom: 1px solid #E0F6FF;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    .bookings-table tr:hover {
+        background: linear-gradient(45deg, #F8FDFF, #FAFFFE);
+    }
+
+    .bookings-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+    }
+
+    .status-pending {
+        background: linear-gradient(45deg, #FFE066, #FFD43B);
+        color: #856404;
+    }
+
+    .status-confirmed {
+        background: linear-gradient(45deg, #51CF66, #69DB7C);
         color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        margin-left: 10px;
-        display: inline-flex;
+    }
+
+    .status-completed {
+        background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+        color: #333;
+    }
+
+    .status-cancelled {
+        background: linear-gradient(45deg, #FF6B6B, #FF8787);
+        color: white;
+    }
+
+    .booking-id {
+        font-weight: 600;
+        color: #FF8C42;
+    }
+
+    .client-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .client-avatar {
+        background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .destination-info {
+        display: flex;
         align-items: center;
         gap: 8px;
     }
-    .nav-btn.danger {
-        background: #e74c3c;
+
+    .destination-icon {
+        color: #FF8C42;
+        width: 16px;
+        text-align: center;
     }
-    table {
-        width: 100%;
-        background: white;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    th, td {
-        padding: 15px;
-        text-align: left;
-        border-bottom: 1px solid #eee;
-    }
-    th {
-        background: #f8f9fa;
+
+    .price-value {
         font-weight: 600;
+        color: #51CF66;
+        font-size: 1.1rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #87CEEB;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    .empty-state h3 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .welcome-banner {
+            flex-direction: column;
+            text-align: center;
+            padding: 25px 20px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .stat-card {
+            padding: 25px 20px;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+        }
+
+        .bookings-table {
+            font-size: 0.85rem;
+        }
+
+        .bookings-table th,
+        .bookings-table td {
+            padding: 12px 10px;
+        }
+
+        .section-header {
+            padding: 20px;
+        }
+
+        .client-info {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .client-avatar {
+            width: 30px;
+            height: 30px;
+            font-size: 0.8rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="admin-header">
-    <h1>
-        <i class="fas fa-tachometer-alt"></i>
-        Dashboard 2AV-Bagages
-    </h1>
-    <div>
-        <a href="{{ url_for('admin_bookings') }}" class="nav-btn">
-            <i class="fas fa-list"></i> Réservations
-        </a>
-        <a href="{{ url_for('admin_logout') }}" class="nav-btn danger">
-            <i class="fas fa-sign-out-alt"></i> Déconnexion
-        </a>
-    </div>
-</div>
-
 <div class="container">
+    <!-- En-tête de page -->
+    <div class="page-header">
+        <div class="page-title">
+            <div class="page-title-icon">
+                <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <span>Dashboard 2AV-Bagages</span>
+        </div>
+        <div class="nav-buttons">
+            <a href="{{ url_for('admin_bookings') }}" class="nav-btn">
+                <i class="fas fa-list"></i> Réservations
+            </a>
+            <a href="{{ url_for('index') }}" class="nav-btn">
+                <i class="fas fa-home"></i> Accueil
+            </a>
+            <a href="{{ url_for('admin_logout') }}" class="nav-btn danger">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+    </div>
+
+    <!-- Bannière de bienvenue -->
+    <div class="welcome-banner">
+        <div class="welcome-icon">
+            <i class="fas fa-star"></i>
+        </div>
+        <div class="welcome-text">
+            <h2>Bienvenue dans votre espace d'administration</h2>
+            <p>Gérez vos réservations et suivez l'activité de 2AV-Bagages en temps réel</p>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div style="font-size: 3rem; color: #3498db; margin-bottom: 15px;">
+            <div class="stat-icon blue">
                 <i class="fas fa-calendar-check"></i>
             </div>
             <div class="stat-number">{{ total_bookings }}</div>
@@ -97,7 +384,7 @@
         </div>
         
         <div class="stat-card">
-            <div style="font-size: 3rem; color: #f39c12; margin-bottom: 15px;">
+            <div class="stat-icon orange">
                 <i class="fas fa-clock"></i>
             </div>
             <div class="stat-number">{{ pending_bookings }}</div>
@@ -105,45 +392,104 @@
         </div>
         
         <div class="stat-card">
-            <div style="font-size: 3rem; color: #27ae60; margin-bottom: 15px;">
+            <div class="stat-icon green">
                 <i class="fas fa-euro-sign"></i>
             </div>
             <div class="stat-number">{{ "%.2f"|format(total_revenue) }}€</div>
             <div class="stat-label">Chiffre d'Affaires</div>
         </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-number">{{ recent_bookings|length }}</div>
+            <div class="stat-label">Récentes</div>
+        </div>
     </div>
 
-    <h2><i class="fas fa-list"></i> Réservations Récentes</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Client</th>
-                <th>Destination</th>
-                <th>Date</th>
-                <th>Prix</th>
-                <th>Statut</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for booking in recent_bookings %}
-            <tr>
-                <td>#{{ booking.id }}</td>
-                <td>{{ booking.client_name }}</td>
-                <td>{{ booking.destination }}</td>
-                <td>{{ booking.pickup_datetime }}</td>
-                <td>{{ "%.2f"|format(booking.estimated_price) }}€</td>
-                <td>
-                    <span style="padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; 
-                          background: {% if booking.status == 'pending' %}#fff3cd; color: #856404;
-                                    {% elif booking.status == 'confirmed' %}#d4edda; color: #155724;
-                                    {% else %}#cce5ff; color: #004085;{% endif %}">
-                        {{ booking.status }}
-                    </span>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Section des réservations récentes -->
+    <div class="recent-bookings-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-list"></i>
+            </div>
+            <h2 class="section-title">Réservations Récentes</h2>
+        </div>
+        
+        {% if recent_bookings %}
+        <table class="bookings-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> ID</th>
+                    <th><i class="fas fa-user"></i> Client</th>
+                    <th><i class="fas fa-map-marker-alt"></i> Destination</th>
+                    <th><i class="fas fa-calendar"></i> Date/Heure</th>
+                    <th><i class="fas fa-euro-sign"></i> Prix</th>
+                    <th><i class="fas fa-info-circle"></i> Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in recent_bookings %}
+                <tr>
+                    <td>
+                        <span class="booking-id">#{{ "%04d"|format(booking.id) }}</span>
+                    </td>
+                    <td>
+                        <div class="client-info">
+                            <div class="client-avatar">
+                                {{ booking.client_name[0].upper() }}
+                            </div>
+                            <span>{{ booking.client_name }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="destination-info">
+                            <i class="fas 
+                                {% if booking.destination == 'aeroport' %}fa-plane
+                                {% elif booking.destination == 'gare' %}fa-train
+                                {% elif booking.destination == 'port' %}fa-ship
+                                {% else %}fa-home{% endif %} destination-icon"></i>
+                            <span>
+                                {% if booking.destination == 'aeroport' %}Aéroport
+                                {% elif booking.destination == 'gare' %}Gare
+                                {% elif booking.destination == 'port' %}Port
+                                {% else %}Domicile{% endif %}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-size: 0.9rem;">
+                            <div style="font-weight: 600;">
+                                {{ booking.pickup_datetime.split(' ')[0] if ' ' in booking.pickup_datetime else booking.pickup_datetime[:10] }}
+                            </div>
+                            <div style="color: #666;">
+                                {{ booking.pickup_datetime.split(' ')[1] if ' ' in booking.pickup_datetime else booking.pickup_datetime[11:16] }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="price-value">{{ "%.2f"|format(booking.estimated_price) }}€</span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ booking.status }}">
+                            {% if booking.status == 'pending' %}En Attente
+                            {% elif booking.status == 'confirmed' %}Confirmée
+                            {% elif booking.status == 'completed' %}Terminée
+                            {% else %}Annulée{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>Aucune réservation récente</h3>
+            <p>Les nouvelles réservations apparaîtront ici</p>
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
