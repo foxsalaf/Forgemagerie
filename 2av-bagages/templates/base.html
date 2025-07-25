@@ -3,17 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}2AV-Bagages{% endblock %}</title>
+    <title>{% block title %}2AV-Bagages - Service de transport de bagages{% endblock %}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #87CEEB 0%, #E0F6FF 50%, #B0E0E6 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Styles communs pour toutes les pages */
+        .page-header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-top: 5px solid #FF8C42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .page-title-icon {
+            background: linear-gradient(45deg, #FF8C42, #FFA500);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+            color: #333;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(45deg, #B0E0E6, #87CEEB);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(135, 206, 235, 0.3);
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(45deg, #FF8C42, #FFA500);
+            color: white;
+        }
+
+        .nav-btn.primary:hover {
+            background: linear-gradient(45deg, #FFA500, #FF8C42);
+            box-shadow: 0 5px 15px rgba(255, 140, 66, 0.4);
+        }
+
+        .nav-btn.danger {
+            background: linear-gradient(45deg, #FF6B6B, #FF8787);
+            color: white;
+        }
+
+        .nav-btn.danger:hover {
+            background: linear-gradient(45deg, #FF5252, #FF6B6B);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .nav-btn.success {
+            background: linear-gradient(45deg, #51CF66, #69DB7C);
+            color: white;
+        }
+
+        .nav-btn.success:hover {
+            background: linear-gradient(45deg, #69DB7C, #51CF66);
+            box-shadow: 0 5px 15px rgba(81, 207, 102, 0.4);
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border-top: 4px solid #87CEEB;
+        }
+
+        .content-padding {
+            padding: 35px;
+        }
+
+        /* Messages flash */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            border: 2px solid;
+        }
+
+        .alert-success {
+            background: linear-gradient(45deg, rgba(81, 207, 102, 0.1), rgba(105, 219, 124, 0.1));
+            border-color: #51CF66;
+            color: #2B8A3E;
+        }
+
+        .alert-error {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.1), rgba(255, 135, 135, 0.1));
+            border-color: #FF6B6B;
+            color: #C92A2A;
+        }
+
+        .alert-info {
+            background: linear-gradient(45deg, rgba(135, 206, 235, 0.1), rgba(176, 224, 230, 0.1));
+            border-color: #87CEEB;
+            color: #1971C2;
+        }
+
+        .alert-warning {
+            background: linear-gradient(45deg, rgba(255, 224, 102, 0.1), rgba(255, 212, 59, 0.1));
+            border-color: #FFE066;
+            color: #E67700;
+        }
+
+        /* Footer commun */
+        .page-footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .footer-icon {
+            background: linear-gradient(45deg, #FF8C42, #FFA500);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .nav-btn {
+                flex: 1;
+                justify-content: center;
+                min-width: 120px;
+            }
+
+            .content-padding {
+                padding: 20px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="container">
+                {% for message in messages %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     {% block content %}{% endblock %}
+
+    <div class="container">
+        <div class="page-footer">
+            <div class="footer-logo">
+                <div class="footer-icon">
+                    <i class="fas fa-suitcase-rolling"></i>
+                </div>
+                <span><strong>2AV-Bagages</strong> - Service professionnel</span>
+            </div>
+            <p>&copy; 2024 2AV-Bagages. Tous droits réservés.</p>
+        </div>
+    </div>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>
