@@ -89,34 +89,63 @@ def get_db_connection():
         conn.close()
 
 def init_database():
-    """Initialisation de la base de données"""
-    with get_db_connection() as conn:
-        # Table des réservations
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS bookings (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                client_type TEXT NOT NULL CHECK (client_type IN ('individuel', 'famille', 'pmr')),
-                destination TEXT NOT NULL CHECK (destination IN ('aeroport', 'gare', 'port', 'domicile')),
-                pickup_address TEXT NOT NULL,
-                pickup_datetime TEXT NOT NULL,
-                bag_count TEXT NOT NULL,
-                client_name TEXT NOT NULL,
-                client_email TEXT NOT NULL,
-                client_phone TEXT NOT NULL,
-                special_instructions TEXT,
-                estimated_price REAL NOT NULL,
-                status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Index pour les performances
-        conn.execute('CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)')
-        conn.execute('CREATE INDEX IF NOT EXISTS idx_bookings_created_at ON bookings(created_at)')
-        conn.execute('CREATE INDEX IF NOT EXISTS idx_bookings_client_email ON bookings(client_email)')
-        
-        conn.commit()
+    """Initialisation de la base de données avec gestion d'erreur"""
+    try:
+        with get_db_connection() as conn:
+            # Adapter la requête pour PostgreSQL ou SQLite
+            database_url = os.environ.get('DATABASE_URL', '')
+            
+            if 'postgresql' in database_url:
+                # PostgreSQL
+                conn.execute('''
+                    CREATE TABLE IF NOT EXISTS bookings (
+                        id SERIAL PRIMARY KEY,
+                        client_type VARCHAR(50) NOT NULL CHECK (client_type IN ('individuel', 'famille', 'pmr')),
+                        destination VARCHAR(50) NOT NULL CHECK (destination IN ('aeroport', 'gare', 'port', 'domicile')),
+                        pickup_address TEXT NOT NULL,
+                        pickup_datetime VARCHAR(50) NOT NULL,
+                        bag_count VARCHAR(10) NOT NULL,
+                        client_name VARCHAR(100) NOT NULL,
+                        client_email VARCHAR(100) NOT NULL,
+                        client_phone VARCHAR(20) NOT NULL,
+                        special_instructions TEXT,
+                        estimated_price DECIMAL(10,2) NOT NULL,
+                        status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+            else:
+                # SQLite (local)
+                conn.execute('''
+                    CREATE TABLE IF NOT EXISTS bookings (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        client_type TEXT NOT NULL CHECK (client_type IN ('individuel', 'famille', 'pmr')),
+                        destination TEXT NOT NULL CHECK (destination IN ('aeroport', 'gare', 'port', 'domicile')),
+                        pickup_address TEXT NOT NULL,
+                        pickup_datetime TEXT NOT NULL,
+                        bag_count TEXT NOT NULL,
+                        client_name TEXT NOT NULL,
+                        client_email TEXT NOT NULL,
+                        client_phone TEXT NOT NULL,
+                        special_instructions TEXT,
+                        estimated_price REAL NOT NULL,
+                        status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+            
+            # Index pour les performances
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)')
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_bookings_created_at ON bookings(created_at)')
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_bookings_client_email ON bookings(client_email)')
+            
+            conn.commit()
+            logger.info("Base de données initialisée avec succès")
+    except Exception as e:
+        logger.error(f"Erreur initialisation base de données: {e}")
+        # Ne pas faire planter l'app si la DB n'est pas prête
 
 def require_admin(f):
     """Décorateur pour les routes admin"""
@@ -232,30 +261,51 @@ def health():
     """Endpoint de santé pour Railway"""
     return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()})
 
+@app.route('/admin/simple-test')
+def admin_simple_test():
+    """Test simple sans base de données"""
+    return """
+    <h1>✅ Test Simple OK</h1>
+    <p>Cette route fonctionne sans problème.</p>
+    <p><a href="/admin/test">Test avec DB</a></p>
+    <p><a href="/admin/login">Login Admin</a></p>
+    """
+
 @app.route('/admin/test')
 def admin_test():
     """Test des routes admin"""
     try:
-        # Test connexion DB
-        with get_db_connection() as conn:
-            result = conn.execute('SELECT COUNT(*) as count FROM bookings').fetchone()
-            db_status = f"DB OK - {result[0]} réservations"
+        # Test variables d'environnement
+        db_url = os.environ.get('DATABASE_URL', 'Non définie')
+        secret_key = 'Définie' if os.environ.get('SECRET_KEY') else 'Non définie'
         
         # Test templates
         import os
         template_dir = os.path.join(os.path.dirname(__file__), 'templates')
         templates = os.listdir(template_dir)
         
+        # Test connexion DB avec gestion d'erreur
+        try:
+            with get_db_connection() as conn:
+                result = conn.execute('SELECT COUNT(*) as count FROM bookings').fetchone()
+                db_status = f"✅ DB OK - {result[0]} réservations"
+        except Exception as db_error:
+            db_status = f"❌ DB ERROR: {str(db_error)}"
+        
         return f"""
-        <h1>Test Admin Routes</h1>
-        <p><strong>Database:</strong> {db_status}</p>
+        <h1>🔧 Test Admin Routes</h1>
+        <p><strong>Database URL:</strong> {db_url[:50]}...</p>
+        <p><strong>Secret Key:</strong> {secret_key}</p>
+        <p><strong>Database Status:</strong> {db_status}</p>
         <p><strong>Templates disponibles:</strong> {', '.join(templates)}</p>
         <p><strong>Session admin:</strong> {'Oui' if session.get('admin_logged_in') else 'Non'}</p>
+        <hr>
+        <p><a href="/admin/simple-test">Test Simple</a></p>
         <p><a href="/admin/login">Login Admin</a></p>
         <p><a href="/admin">Dashboard Admin</a></p>
         """
     except Exception as e:
-        return f"Erreur test: {str(e)}", 500
+        return f"❌ Erreur test: {str(e)}", 500
 
 @app.route('/calculate-price', methods=['POST'])
 def calculate_price_api():
