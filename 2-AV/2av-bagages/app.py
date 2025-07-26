@@ -510,10 +510,11 @@ def not_found(error):
 def internal_error(error):
     return render_template('500.html'), 500
 
-# Point d'entrée
+# Initialisation pour Railway/Gunicorn
+init_database()
 
+# Point d'entrée pour développement local
 if __name__ == '__main__':
-    init_database()
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
     app.run(host='0.0.0.0', port=port, debug=debug)
