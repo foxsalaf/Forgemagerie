@@ -1,0 +1,892 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion Réservations - 2AV-Bagages{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Styles spécifiques à la gestion des réservations */
+    .filters-section {
+        background: white;
+        padding: 25px 35px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        border-top: 4px solid #87CEEB;
+    }
+
+    .filters-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .filters-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: #333;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .filters-icon {
+        background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 12px 20px;
+        border: 2px solid #87CEEB;
+        background: transparent;
+        color: #333;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+        background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+        color: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(135, 206, 235, 0.3);
+    }
+
+    .bookings-section {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        border-top: 4px solid #FF8C42;
+    }
+
+    .section-header {
+        padding: 25px 35px;
+        border-bottom: 2px solid #E0F6FF;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: #333;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .section-icon {
+        background: linear-gradient(45deg, #FF8C42, #FFA500);
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .bookings-count {
+        background: linear-gradient(45deg, #E0F6FF, #B0E0E6);
+        color: #333;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .bookings-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    .bookings-table th {
+        background: linear-gradient(45deg, #F8FDFF, #E0F6FF);
+        text-align: left;
+        padding: 18px 15px;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #87CEEB;
+        font-size: 0.95rem;
+        white-space: nowrap;
+    }
+
+    .bookings-table td {
+        text-align: left;
+        padding: 18px 15px;
+        border-bottom: 1px solid #E0F6FF;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    .bookings-table tr:hover {
+        background: linear-gradient(45deg, #F8FDFF, #FAFFFE);
+        cursor: pointer;
+    }
+
+    .bookings-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .booking-id {
+        font-weight: 600;
+        color: #FF8C42;
+        font-size: 1rem;
+    }
+
+    .client-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .client-avatar {
+        background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        font-weight: 600;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .client-details {
+        min-width: 0;
+    }
+
+    .client-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 2px;
+    }
+
+    .client-type {
+        background: linear-gradient(45deg, #E0F6FF, #B0E0E6);
+        color: #333;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .destination-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .destination-icon {
+        color: #FF8C42;
+        width: 18px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    .destination-text {
+        font-weight: 500;
+    }
+
+    .datetime-info {
+        font-size: 0.9rem;
+    }
+
+    .date-text {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 2px;
+    }
+
+    .time-text {
+        color: #666;
+    }
+
+    .price-value {
+        font-weight: 600;
+        color: #51CF66;
+        font-size: 1.1rem;
+    }
+
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        text-align: center;
+        min-width: 90px;
+    }
+
+    .status-pending {
+        background: linear-gradient(45deg, #FFE066, #FFD43B);
+        color: #856404;
+    }
+
+    .status-confirmed {
+        background: linear-gradient(45deg, #51CF66, #69DB7C);
+        color: white;
+    }
+
+    .status-completed {
+        background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+        color: #333;
+    }
+
+    .status-cancelled {
+        background: linear-gradient(45deg, #FF6B6B, #FF8787);
+        color: white;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        color: white;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        min-width: 35px;
+        justify-content: center;
+    }
+
+    .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #87CEEB, #B0E0E6);
+        color: #333;
+    }
+
+    .btn-success {
+        background: linear-gradient(45deg, #51CF66, #69DB7C);
+    }
+
+    .btn-warning {
+        background: linear-gradient(45deg, #FFE066, #FFD43B);
+        color: #856404;
+    }
+
+    .btn-danger {
+        background: linear-gradient(45deg, #FF6B6B, #FF8787);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #666;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #87CEEB;
+        margin-bottom: 25px;
+        display: block;
+    }
+
+    .empty-state h3 {
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 1.5rem;
+    }
+
+    .empty-state p {
+        font-size: 1.1rem;
+        margin-bottom: 25px;
+    }
+
+    .empty-state .nav-btn {
+        display: inline-flex;
+        margin-top: 15px;
+    }
+
+    /* Modal pour les détails */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal-dialog {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 800px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        border-top: 5px solid #FF8C42;
+        animation: slideUp 0.3s ease;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #E0F6FF;
+    }
+
+    .modal-title {
+        font-size: 1.6rem;
+        color: #333;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .modal-icon {
+        background: linear-gradient(45deg, #FF8C42, #FFA500);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: #999;
+        transition: color 0.3s ease;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close-btn:hover {
+        color: #FF6B6B;
+        background: rgba(255, 107, 107, 0.1);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -40%);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .filters-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-buttons {
+            justify-content: center;
+        }
+
+        .filter-btn {
+            flex: 1;
+            justify-content: center;
+            min-width: 100px;
+            padding: 10px 15px;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+        }
+
+        .bookings-table {
+            font-size: 0.8rem;
+        }
+
+        .bookings-table th,
+        .bookings-table td {
+            padding: 12px 8px;
+        }
+
+        .client-info {
+            flex-direction: column;
+            gap: 8px;
+            text-align: center;
+        }
+
+        .client-avatar {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+            margin: 0 auto;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .modal-dialog {
+            padding: 25px;
+            margin: 10px;
+            width: calc(100% - 20px);
+        }
+
+        .filters-section,
+        .bookings-section {
+            margin-left: -10px;
+            margin-right: -10px;
+            border-radius: 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 10px;
+        }
+
+        .page-header {
+            padding: 20px;
+        }
+
+        .filters-section {
+            padding: 20px;
+        }
+
+        .section-header {
+            padding: 20px;
+        }
+
+        .bookings-table th,
+        .bookings-table td {
+            padding: 8px 5px;
+            font-size: 0.75rem;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            min-width: 80px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- En-tête de page -->
+    <div class="page-header">
+        <div class="page-title">
+            <div class="page-title-icon">
+                <i class="fas fa-list-alt"></i>
+            </div>
+            <span>Gestion des Réservations</span>
+        </div>
+        <div class="nav-buttons">
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-btn">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="{{ url_for('index') }}" class="nav-btn">
+                <i class="fas fa-home"></i> Accueil
+            </a>
+            <a href="{{ url_for('admin_logout') }}" class="nav-btn danger">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+    </div>
+
+    <!-- Section des filtres -->
+    <div class="filters-section">
+        <div class="filters-header">
+            <div class="filters-title">
+                <div class="filters-icon">
+                    <i class="fas fa-filter"></i>
+                </div>
+                <span>Filtrer les réservations</span>
+            </div>
+            <div class="filter-buttons">
+                <a href="{{ url_for('admin_bookings') }}" 
+                   class="filter-btn {{ 'active' if status_filter == 'all' else '' }}">
+                    <i class="fas fa-globe"></i> Toutes
+                </a>
+                <a href="{{ url_for('admin_bookings', status='pending') }}" 
+                   class="filter-btn {{ 'active' if status_filter == 'pending' else '' }}">
+                    <i class="fas fa-clock"></i> En Attente
+                </a>
+                <a href="{{ url_for('admin_bookings', status='confirmed') }}" 
+                   class="filter-btn {{ 'active' if status_filter == 'confirmed' else '' }}">
+                    <i class="fas fa-check"></i> Confirmées
+                </a>
+                <a href="{{ url_for('admin_bookings', status='completed') }}" 
+                   class="filter-btn {{ 'active' if status_filter == 'completed' else '' }}">
+                    <i class="fas fa-flag-checkered"></i> Terminées
+                </a>
+                <a href="{{ url_for('admin_bookings', status='cancelled') }}" 
+                   class="filter-btn {{ 'active' if status_filter == 'cancelled' else '' }}">
+                    <i class="fas fa-times"></i> Annulées
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section des réservations -->
+    <div class="bookings-section">
+        <div class="section-header">
+            <div class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <span>
+                    {% if status_filter == 'all' %}Toutes les réservations
+                    {% elif status_filter == 'pending' %}Réservations en attente
+                    {% elif status_filter == 'confirmed' %}Réservations confirmées
+                    {% elif status_filter == 'completed' %}Réservations terminées
+                    {% elif status_filter == 'cancelled' %}Réservations annulées
+                    {% endif %}
+                </span>
+            </div>
+            <div class="bookings-count">
+                {{ bookings|length }} réservation{{ 's' if bookings|length != 1 else '' }}
+            </div>
+        </div>
+        
+        {% if bookings %}
+        <table class="bookings-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> ID</th>
+                    <th><i class="fas fa-user"></i> Client</th>
+                    <th><i class="fas fa-map-marker-alt"></i> Destination</th>
+                    <th><i class="fas fa-calendar"></i> Date/Heure</th>
+                    <th><i class="fas fa-suitcase"></i> Bagages</th>
+                    <th><i class="fas fa-euro-sign"></i> Prix</th>
+                    <th><i class="fas fa-info-circle"></i> Statut</th>
+                    <th><i class="fas fa-cogs"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr onclick="viewBooking({{ booking.id }})">
+                    <td>
+                        <span class="booking-id">#{{ "%04d"|format(booking.id) }}</span>
+                    </td>
+                    <td>
+                        <div class="client-info">
+                            <div class="client-avatar">
+                                {{ booking.client_name[0].upper() }}
+                            </div>
+                            <div class="client-details">
+                                <div class="client-name">{{ booking.client_name }}</div>
+                                <div class="client-type">
+                                    {% if booking.client_type == 'individuel' %}Individuel
+                                    {% elif booking.client_type == 'famille' %}Famille
+                                    {% elif booking.client_type == 'pmr' %}PMR
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="destination-info">
+                            <i class="fas 
+                                {% if booking.destination == 'aeroport' %}fa-plane
+                                {% elif booking.destination == 'gare' %}fa-train
+                                {% elif booking.destination == 'port' %}fa-ship
+                                {% else %}fa-home{% endif %} destination-icon"></i>
+                            <span class="destination-text">
+                                {% if booking.destination == 'aeroport' %}Aéroport
+                                {% elif booking.destination == 'gare' %}Gare
+                                {% elif booking.destination == 'port' %}Port
+                                {% else %}Domicile{% endif %}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="datetime-info">
+                            <div class="date-text">
+                                {{ booking.pickup_datetime.split(' ')[0] if ' ' in booking.pickup_datetime else booking.pickup_datetime[:10] }}
+                            </div>
+                            <div class="time-text">
+                                {{ booking.pickup_datetime.split(' ')[1] if ' ' in booking.pickup_datetime else booking.pickup_datetime[11:16] }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <strong>{{ booking.bag_count }}</strong>
+                    </td>
+                    <td>
+                        <span class="price-value">{{ "%.2f"|format(booking.estimated_price) }}€</span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ booking.status }}">
+                            {% if booking.status == 'pending' %}En Attente
+                            {% elif booking.status == 'confirmed' %}Confirmée
+                            {% elif booking.status == 'completed' %}Terminée
+                            {% else %}Annulée{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-sm btn-primary" onclick="event.stopPropagation(); viewBooking({{ booking.id }})" title="Voir les détails">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            {% if booking.status == 'pending' %}
+                                <button class="btn-sm btn-success" onclick="event.stopPropagation(); updateStatus({{ booking.id }}, 'confirmed')" title="Confirmer">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            {% endif %}
+                            {% if booking.status == 'confirmed' %}
+                                <button class="btn-sm btn-success" onclick="event.stopPropagation(); updateStatus({{ booking.id }}, 'completed')" title="Terminer">
+                                    <i class="fas fa-flag-checkered"></i>
+                                </button>
+                            {% endif %}
+                            {% if booking.status in ['pending', 'confirmed'] %}
+                                <button class="btn-sm btn-danger" onclick="event.stopPropagation(); updateStatus({{ booking.id }}, 'cancelled')" title="Annuler">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>Aucune réservation trouvée</h3>
+            <p>
+                {% if status_filter == 'all' %}Aucune réservation n'a encore été effectuée.
+                {% else %}Aucune réservation avec le statut "{{ status_filter }}" trouvée.
+                {% endif %}
+            </p>
+            {% if status_filter != 'all' %}
+                <a href="{{ url_for('admin_bookings') }}" class="nav-btn">
+                    <i class="fas fa-list"></i> Voir toutes les réservations
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal pour les détails (à implémenter avec JavaScript) -->
+<div class="modal" id="bookingModal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <div class="modal-title">
+                <div class="modal-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <span>Détails de la Réservation</span>
+            </div>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div id="bookingDetails">
+            <!-- Détails seront chargés ici via JavaScript -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Fonctions JavaScript pour l'interactivité (à adapter selon vos besoins)
+    function viewBooking(id) {
+        // Implémenter l'affichage des détails de la réservation
+        console.log('Voir réservation #' + id);
+        // Vous pouvez faire un appel AJAX pour récupérer les détails
+    }
+
+    function updateStatus(id, newStatus) {
+        const statusMessages = {
+            'confirmed': 'confirmer',
+            'completed': 'marquer comme terminée',
+            'cancelled': 'annuler'
+        };
+
+        if (confirm(`Êtes-vous sûr de vouloir ${statusMessages[newStatus]} cette réservation ?`)) {
+            // Appel AJAX pour mettre à jour le statut
+            fetch(`/admin/update-status/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({status: newStatus})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(`Réservation ${statusMessages[newStatus]}e avec succès !`, 'success');
+                    // Recharger la page après un court délai
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showNotification('Erreur lors de la mise à jour du statut', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showNotification('Erreur lors de la mise à jour du statut', 'error');
+            });
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('bookingModal').style.display = 'none';
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        
+        const colors = {
+            'success': 'linear-gradient(45deg, #51CF66, #69DB7C)',
+            'info': 'linear-gradient(45deg, #87CEEB, #B0E0E6)',
+            'warning': 'linear-gradient(45deg, #FFE066, #FFD43B)',
+            'error': 'linear-gradient(45deg, #FF6B6B, #FF8787)'
+        };
+
+        const icons = {
+            'success': 'fa-check-circle',
+            'info': 'fa-info-circle',
+            'warning': 'fa-exclamation-triangle',
+            'error': 'fa-times-circle'
+        };
+
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${colors[type]};
+            color: ${type === 'info' || type === 'warning' ? '#333' : 'white'};
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 10000;
+            animation: slideInRight 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            max-width: 350px;
+        `;
+        
+        notification.innerHTML = `
+            <i class="fas ${icons[type]}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.4s ease-in';
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 400);
+        }, 4000);
+    }
+
+    // Fermeture de la modal en cliquant à l'extérieur
+    window.onclick = function(event) {
+        const modal = document.getElementById('bookingModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // Gestion des touches clavier
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('bookingModal').style.display === 'block') {
+            closeModal();
+        }
+    });
+
+    // Animations CSS supplémentaires
+    const additionalStyles = document.createElement('style');
+    additionalStyles.textContent = `
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideOutRight {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100%); }
+        }
+    `;
+    document.head.appendChild(additionalStyles);
+</script>
+{% endblock %}
