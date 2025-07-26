@@ -667,13 +667,19 @@ const totalSteps = 4;
 
 // Gestion des étapes du formulaire
 function showStep(step) {
-    // Masquer toutes les étapes
-    document.querySelectorAll('.form-step').forEach(stepEl => {
-        stepEl.classList.remove('active');
-    });
-    
-    // Afficher l'étape actuelle
-    document.querySelector(`[data-step="${step}"]`).classList.add('active');
+    try {
+        // Masquer toutes les étapes
+        document.querySelectorAll('.form-step').forEach(stepEl => {
+            stepEl.classList.remove('active');
+        });
+        
+        // Afficher l'étape actuelle avec vérification
+        const activeStep = document.querySelector(`[data-step="${step}"]`);
+        if (!activeStep) {
+            console.error(`Étape ${step} non trouvée`);
+            return;
+        }
+        activeStep.classList.add('active');
     
     // Mettre à jour les indicateurs
     document.querySelectorAll('.step').forEach((stepEl, index) => {
@@ -725,6 +731,10 @@ function changeStep(direction) {
 
 function validateCurrentStep() {
     const currentStepEl = document.querySelector(`[data-step="${currentStep}"]`);
+    if (!currentStepEl) {
+        console.error(`Étape ${currentStep} non trouvée`);
+        return false;
+    }
     const requiredFields = currentStepEl.querySelectorAll('[required]');
     
     for (let field of requiredFields) {
@@ -739,6 +749,10 @@ function validateCurrentStep() {
     }
     
     return true;
+    } catch (error) {
+        console.error('Erreur lors du changement d’étape:', error);
+        return false;
+    }
 }
 
 function calculatePrice() {
@@ -761,7 +775,12 @@ function calculatePrice() {
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(result => {
         if (result.success) {
             document.getElementById('estimatedPrice').textContent = result.price;
@@ -778,14 +797,14 @@ function generateSummary() {
     const data = {};
     
     for (let [key, value] of formData.entries()) {
-        data[key] = value;
+        data[key] = escapeHtml(value); // Sécurisation contre XSS
     }
     
     const summaryHtml = `
         <h4 style="color: var(--primary-color); margin-bottom: 1rem;">Résumé de votre réservation</h4>
         <div style="text-align: left; color: white;">
-            <p><strong>Profil :</strong> ${getClientTypeLabel(data.client_type)}</p>
-            <p><strong>Destination :</strong> ${getDestinationLabel(data.destination)}</p>
+            <p><strong>Profil :</strong> ${escapeHtml(getClientTypeLabel(data.client_type))}</p>
+            <p><strong>Destination :</strong> ${escapeHtml(getDestinationLabel(data.destination))}</p>
             <p><strong>Collecte :</strong> ${data.pickup_address}</p>
             <p><strong>Date/Heure :</strong> ${formatDateTime(data.pickup_date, data.pickup_time)}</p>
             <p><strong>Bagages :</strong> ${data.bag_count}</p>
@@ -817,17 +836,37 @@ function getDestinationLabel(dest) {
     return labels[dest] || dest;
 }
 
+// Fonction pour échapper le HTML et prévenir XSS
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 function formatDateTime(date, time) {
     if (!date || !time) return '';
-    const dateObj = new Date(date + 'T' + time);
-    return dateObj.toLocaleString('fr-FR', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    try {
+        const dateObj = new Date(date + 'T' + time);
+        if (isNaN(dateObj.getTime())) {
+            return 'Date invalide';
+        }
+        return dateObj.toLocaleString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (error) {
+        console.error('Erreur formatage date:', error);
+        return 'Date invalide';
+    }
 }
 
 // Soumission du formulaire
@@ -860,7 +899,12 @@ document.getElementById('bookingForm').addEventListener('submit', function(e) {
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(result => {
         if (result.success) {
             // Succès
