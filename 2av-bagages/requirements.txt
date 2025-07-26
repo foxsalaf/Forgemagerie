@@ -1,74 +1,15 @@
-# =====================================================
-# REQUIREMENTS.TXT - 2AV-BAGAGES RAILWAY
-# Version corrigée et optimisée
-# =====================================================
-
-# Flask core (versions compatibles)
-Flask==2.3.3
-Werkzeug==2.3.7
-
-# Dépendances Flask automatiques
-Jinja2>=3.1.2
-click>=8.1.3
-itsdangerous>=2.1.2
-blinker>=1.6.2
-
-# Base de données PostgreSQL
-psycopg2-binary==2.9.9
-
-# Email et validation
-email-validator==2.1.0.post1
-
-# Utilitaires
-python-dotenv==1.0.0
+colorlog==6.7.0
+Flask==3.0.0
+Werkzeug==3.0.1
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+itsdangerous==2.1.2
+click==8.1.7
+blinker==1.7.0
 requests==2.31.0
-
-# Sécurité (versions compatibles)
-bcrypt==4.1.2
-cryptography>=41.0.0
-
-# Date et temps
-python-dateutil==2.8.2
-
-# Production WSGI
+urllib3==2.1.0
+certifi==2023.11.17
+charset-normalizer==3.3.2
+idna==3.6
+psycopg2-binary==2.9.9
 gunicorn==21.2.0
-
-# Logging (optionnel - retiré car peut causer des conflits)
-# colorlog==6.7.0
-
-# =====================================================
-# NOTES IMPORTANTES :
-# =====================================================
-# 
-# 1. PACKAGES RETIRÉS (inclus avec Python) :
-#    - smtplib (inclus avec Python)
-#    - sqlite3 (inclus avec Python)
-#
-# 2. PACKAGES OPTIONNELS RETIRÉS (pour éviter les conflits) :
-#    - waitress (pas nécessaire sur Railway)
-#    - flask-debugtoolbar (debug uniquement)
-#    - pytest, pytest-flask (tests locaux)
-#    - flask-restx (API doc, pas nécessaire)
-#    - colorlog (peut causer des conflits)
-#
-# 3. VERSIONS MISES À JOUR :
-#    - psycopg2-binary : 2.9.9 (dernière version stable)
-#    - email-validator : 2.1.0.post1 (version récente)
-#    - bcrypt : 4.1.2 (compatible Python 3.11+)
-#
-# =====================================================
-# VARIABLES D'ENVIRONNEMENT RAILWAY :
-# =====================================================
-#
-# Variables OBLIGATOIRES à ajouter dans Railway :
-# DATABASE_URL=postgresql://postgres:password@postgres.railway.internal:5432/railway
-# SECRET_KEY=votre-cle-secrete-tres-longue-et-securisee
-# FLASK_ENV=production
-#
-# Variables OPTIONNELLES :
-# EMAIL_USER=2av.bagage@gmail.com
-# EMAIL_PASS=votre-mot-de-passe-application-gmail
-# GOOGLE_MAPS_API_KEY=votre-cle-google-maps
-# PORT=5000
-#
-# =====================================================
