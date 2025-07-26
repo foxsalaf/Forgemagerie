@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(where python)",
+      "Bash(/c/Users/Salaf/AppData/Local/Microsoft/WindowsApps/python -m py_compile app.py)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)"
+    ],
+    "deny": []
+  }
+}
