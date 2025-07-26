@@ -445,7 +445,6 @@ def admin_login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
         
         if username == ADMIN_USERNAME and bcrypt.checkpw(password.encode('utf-8'), ADMIN_PASSWORD_HASH.encode('utf-8')):
             session['admin_logged_in'] = True

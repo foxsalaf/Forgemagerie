@@ -303,6 +303,62 @@
         margin-bottom: 1rem;
     }
 
+    /* Accessibility improvements */
+    .required-indicator {
+        color: #FF6B6B;
+        font-weight: bold;
+        margin-left: 4px;
+    }
+    
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+    
+    /* Improved placeholder contrast for WCAG compliance */
+    .form-input::placeholder {
+        color: rgba(255, 255, 255, 0.7) !important;
+        opacity: 1;
+    }
+    
+    .form-input:focus::placeholder {
+        color: rgba(0, 0, 0, 0.6) !important;
+    }
+    
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .required-indicator {
+            color: #FF4444;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+    }
+    
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+        .mascot {
+            animation: none;
+        }
+        
+        .step {
+            transition: none;
+        }
+        
+        .form-step.active {
+            animation: none;
+        }
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .hero-content {
@@ -373,12 +429,13 @@
         </div>
         
         <!-- Formulaire de réservation -->
-        <div class="booking-form" id="booking">
+        <div class="booking-form" id="booking" role="region" aria-labelledby="booking-title">
             <div class="mascot"></div>
             
-            <form id="bookingForm">
+            <form id="bookingForm" role="form" aria-labelledby="booking-title">
+                <h2 id="booking-title" class="sr-only">Formulaire de réservation de transport de bagages</h2>
                 <!-- Indicateur d'étapes -->
-                <div class="step-indicator">
+                <div class="step-indicator" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" aria-label="Progression du formulaire">
                     <div class="step active" data-step="1">1</div>
                     <div class="step" data-step="2">2</div>
                     <div class="step" data-step="3">3</div>
@@ -386,97 +443,110 @@
                 </div>
                 
                 <!-- Étape 1: Type de client et destination -->
-                <div class="form-step active" data-step="1">
-                    <h3 class="form-title">Choisissez votre profil et destination</h3>
+                <div class="form-step active" data-step="1" role="group" aria-labelledby="step1-title">
+                    <h3 id="step1-title" class="form-title">Choisissez votre profil et destination</h3>
                     
                     <div class="form-group">
-                        <label class="form-label">Type de client</label>
-                        <select class="form-input form-select" name="client_type" required>
+                        <label class="form-label" for="client_type">Type de client <span class="required-indicator" aria-label="obligatoire">*</span></label>
+                        <select class="form-input form-select" id="client_type" name="client_type" required aria-describedby="client_type_help">
                             <option value="">Sélectionnez votre profil</option>
                             <option value="individuel">Particulier individuel</option>
                             <option value="famille">Famille (3+ personnes)</option>
                             <option value="pmr">Personne à mobilité réduite</option>
                         </select>
+                        <div id="client_type_help" class="sr-only">Choisissez le type qui correspond à votre situation</div>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Destination</label>
-                        <select class="form-input form-select" name="destination" required>
+                        <label class="form-label" for="destination">Destination <span class="required-indicator" aria-label="obligatoire">*</span></label>
+                        <select class="form-input form-select" id="destination" name="destination" required aria-describedby="destination_help">
                             <option value="">Où devons-nous livrer ?</option>
                             <option value="aeroport">Aéroport (Marseille Provence)</option>
                             <option value="gare">Gare (Saint-Charles, TGV...)</option>
                             <option value="port">Port de Marseille</option>
                             <option value="domicile">Adresse personnalisée</option>
                         </select>
+                        <div id="destination_help" class="sr-only">Sélectionnez le lieu de livraison de vos bagages</div>
                     </div>
                 </div>
                 
                 <!-- Étape 2: Adresse et horaire -->
-                <div class="form-step" data-step="2">
-                    <h3 class="form-title">Adresse de collecte et horaire</h3>
+                <div class="form-step" data-step="2" role="group" aria-labelledby="step2-title">
+                    <h3 id="step2-title" class="form-title">Adresse de collecte et horaire</h3>
                     
                     <div class="form-group">
-                        <label class="form-label">Adresse de collecte</label>
-                        <input type="text" class="form-input" name="pickup_address" 
-                               placeholder="123 Rue de la Paix, 13001 Marseille" required>
+                        <label class="form-label" for="pickup_address">Adresse de collecte <span class="required-indicator" aria-label="obligatoire">*</span></label>
+                        <input type="text" class="form-input" id="pickup_address" name="pickup_address" 
+                               placeholder="123 Rue de la Paix, 13001 Marseille" required 
+                               aria-describedby="pickup_address_help">
+                        <div id="pickup_address_help" class="sr-only">Saisissez l'adresse complète où nous devons récupérer vos bagages</div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Date</label>
-                            <input type="date" class="form-input" name="pickup_date" required>
+                            <label class="form-label" for="pickup_date">Date <span class="required-indicator" aria-label="obligatoire">*</span></label>
+                            <input type="date" class="form-input" id="pickup_date" name="pickup_date" required 
+                                   aria-describedby="pickup_date_help">
+                            <div id="pickup_date_help" class="sr-only">Date de collecte de vos bagages</div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Heure</label>
-                            <input type="time" class="form-input" name="pickup_time" required>
+                            <label class="form-label" for="pickup_time">Heure <span class="required-indicator" aria-label="obligatoire">*</span></label>
+                            <input type="time" class="form-input" id="pickup_time" name="pickup_time" required 
+                                   aria-describedby="pickup_time_help">
+                            <div id="pickup_time_help" class="sr-only">Heure de collecte de vos bagages</div>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Nombre de bagages</label>
-                        <select class="form-input form-select" name="bag_count" required>
+                        <label class="form-label" for="bag_count">Nombre de bagages <span class="required-indicator" aria-label="obligatoire">*</span></label>
+                        <select class="form-input form-select" id="bag_count" name="bag_count" required aria-describedby="bag_count_help">
                             <option value="">Combien de bagages ?</option>
                             <option value="1">1 bagage</option>
                             <option value="2">2 bagages</option>
                             <option value="3">3 bagages</option>
                             <option value="4+">4 bagages ou plus</option>
                         </select>
+                        <div id="bag_count_help" class="sr-only">Sélectionnez le nombre de bagages à transporter</div>
                     </div>
                 </div>
                 
                 <!-- Étape 3: Informations personnelles -->
-                <div class="form-step" data-step="3">
-                    <h3 class="form-title">Vos informations de contact</h3>
+                <div class="form-step" data-step="3" role="group" aria-labelledby="step3-title">
+                    <h3 id="step3-title" class="form-title">Vos informations de contact</h3>
                     
                     <div class="form-group">
-                        <label class="form-label">Nom complet</label>
-                        <input type="text" class="form-input" name="client_name" 
-                               placeholder="Jean Dupont" required>
+                        <label class="form-label" for="client_name">Nom complet <span class="required-indicator" aria-label="obligatoire">*</span></label>
+                        <input type="text" class="form-input" id="client_name" name="client_name" 
+                               placeholder="Jean Dupont" required aria-describedby="client_name_help">
+                        <div id="client_name_help" class="sr-only">Saisissez votre nom et prénom complets</div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-input" name="client_email" 
-                                   placeholder="jean@exemple.com" required>
+                            <label class="form-label" for="client_email">Email <span class="required-indicator" aria-label="obligatoire">*</span></label>
+                            <input type="email" class="form-input" id="client_email" name="client_email" 
+                                   placeholder="jean@exemple.com" required aria-describedby="client_email_help">
+                            <div id="client_email_help" class="sr-only">Saisissez votre adresse email pour recevoir la confirmation</div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Téléphone</label>
-                            <input type="tel" class="form-input" name="client_phone" 
-                                   placeholder="06 12 34 56 78" required>
+                            <label class="form-label" for="client_phone">Téléphone <span class="required-indicator" aria-label="obligatoire">*</span></label>
+                            <input type="tel" class="form-input" id="client_phone" name="client_phone" 
+                                   placeholder="06 12 34 56 78" required aria-describedby="client_phone_help">
+                            <div id="client_phone_help" class="sr-only">Saisissez votre numéro de téléphone pour être contacté</div>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Instructions spéciales (optionnel)</label>
-                        <textarea class="form-input" name="special_instructions" rows="3"
-                                  placeholder="Vol Air France AF1234, Terminal 2E, étage 3 sans ascenseur..."></textarea>
+                        <label class="form-label" for="special_instructions">Instructions spéciales (optionnel)</label>
+                        <textarea class="form-input" id="special_instructions" name="special_instructions" rows="3"
+                                  placeholder="Vol Air France AF1234, Terminal 2E, étage 3 sans ascenseur..." aria-describedby="special_instructions_help"></textarea>
+                        <div id="special_instructions_help" class="sr-only">Informations complémentaires pour la livraison (numéro de vol, instructions d'accès, etc.)</div>
                     </div>
                 </div>
                 
                 <!-- Étape 4: Confirmation -->
-                <div class="form-step" data-step="4">
-                    <h3 class="form-title">Confirmation de votre réservation</h3>
+                <div class="form-step" data-step="4" role="group" aria-labelledby="step4-title">
+                    <h3 id="step4-title" class="form-title">Confirmation de votre réservation</h3>
                     
                     <div id="bookingSummary" class="glass-card" style="background: rgba(255,255,255,0.1); margin-bottom: 2rem;">
                         <!-- Le résumé sera généré par JavaScript -->
@@ -693,6 +763,13 @@ function showStep(step) {
         }
     });
     
+    // Mettre à jour la barre de progression
+    const progressBar = document.querySelector('.step-indicator');
+    if (progressBar) {
+        progressBar.setAttribute('aria-valuenow', step);
+        progressBar.setAttribute('aria-valuetext', `Étape ${step} sur ${totalSteps}`);
+    }
+    
     // Gérer les boutons de navigation
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
@@ -730,27 +807,51 @@ function changeStep(direction) {
 }
 
 function validateCurrentStep() {
-    const currentStepEl = document.querySelector(`[data-step="${currentStep}"]`);
-    if (!currentStepEl) {
-        console.error(`Étape ${currentStep} non trouvée`);
-        return false;
-    }
-    const requiredFields = currentStepEl.querySelectorAll('[required]');
-    
-    for (let field of requiredFields) {
-        if (!field.value.trim()) {
-            field.focus();
-            field.style.borderColor = 'var(--error-color)';
-            setTimeout(() => {
-                field.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-            }, 2000);
+    try {
+        const currentStepEl = document.querySelector(`[data-step="${currentStep}"]`);
+        if (!currentStepEl) {
+            console.error(`Étape ${currentStep} non trouvée`);
             return false;
         }
-    }
-    
-    return true;
+        
+        // Supprimer les messages d'erreur existants
+        currentStepEl.querySelectorAll('.error-message').forEach(msg => msg.remove());
+        
+        const requiredFields = currentStepEl.querySelectorAll('[required]');
+        let isValid = true;
+        
+        for (let field of requiredFields) {
+            // Réinitialiser le style du champ
+            field.style.borderColor = '';
+            field.setAttribute('aria-invalid', 'false');
+            
+            if (!field.value.trim()) {
+                isValid = false;
+                field.style.borderColor = '#FF6B6B';
+                field.setAttribute('aria-invalid', 'true');
+                
+                // Créer un message d'erreur accessible
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'error-message';
+                errorMessage.style.cssText = 'color: #FF6B6B; font-size: 0.9rem; margin-top: 0.5rem;';
+                errorMessage.setAttribute('role', 'alert');
+                errorMessage.setAttribute('aria-live', 'polite');
+                
+                const label = currentStepEl.querySelector(`label[for="${field.id}"]`);
+                const fieldName = label ? label.textContent.replace('*', '').trim() : field.name;
+                errorMessage.textContent = `Le champ "${fieldName}" est obligatoire`;
+                
+                field.parentNode.appendChild(errorMessage);
+                
+                if (isValid) { // Focus seulement sur le premier champ invalide
+                    field.focus();
+                }
+            }
+        }
+        
+        return isValid;
     } catch (error) {
-        console.error('Erreur lors du changement d’étape:', error);
+        console.error('Erreur lors du changement d'étape:', error);
         return false;
     }
 }
