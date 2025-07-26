@@ -232,6 +232,31 @@ def health():
     """Endpoint de santé pour Railway"""
     return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()})
 
+@app.route('/admin/test')
+def admin_test():
+    """Test des routes admin"""
+    try:
+        # Test connexion DB
+        with get_db_connection() as conn:
+            result = conn.execute('SELECT COUNT(*) as count FROM bookings').fetchone()
+            db_status = f"DB OK - {result[0]} réservations"
+        
+        # Test templates
+        import os
+        template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+        templates = os.listdir(template_dir)
+        
+        return f"""
+        <h1>Test Admin Routes</h1>
+        <p><strong>Database:</strong> {db_status}</p>
+        <p><strong>Templates disponibles:</strong> {', '.join(templates)}</p>
+        <p><strong>Session admin:</strong> {'Oui' if session.get('admin_logged_in') else 'Non'}</p>
+        <p><a href="/admin/login">Login Admin</a></p>
+        <p><a href="/admin">Dashboard Admin</a></p>
+        """
+    except Exception as e:
+        return f"Erreur test: {str(e)}", 500
+
 @app.route('/calculate-price', methods=['POST'])
 def calculate_price_api():
     """API de calcul de prix"""
@@ -390,52 +415,60 @@ def admin_logout():
 @require_admin
 def admin_dashboard():
     """Dashboard admin"""
-    with get_db_connection() as conn:
-        # Statistiques
-        stats = {}
-        stats['total_bookings'] = conn.execute('SELECT COUNT(*) FROM bookings').fetchone()[0]
-        stats['pending_bookings'] = conn.execute('SELECT COUNT(*) FROM bookings WHERE status = "pending"').fetchone()[0]
-        stats['today_bookings'] = conn.execute('SELECT COUNT(*) FROM bookings WHERE DATE(created_at) = DATE("now")').fetchone()[0]
+    try:
+        with get_db_connection() as conn:
+            # Statistiques
+            stats = {}
+            stats['total_bookings'] = conn.execute('SELECT COUNT(*) FROM bookings').fetchone()[0]
+            stats['pending_bookings'] = conn.execute('SELECT COUNT(*) FROM bookings WHERE status = "pending"').fetchone()[0]
+            stats['today_bookings'] = conn.execute('SELECT COUNT(*) FROM bookings WHERE DATE(created_at) = DATE("now")').fetchone()[0]
+            
+            revenue_result = conn.execute('SELECT SUM(estimated_price) FROM bookings WHERE status = "completed"').fetchone()
+            stats['total_revenue'] = revenue_result[0] if revenue_result[0] else 0
+            
+            # Réservations récentes
+            recent_bookings = conn.execute('''
+                SELECT * FROM bookings 
+                ORDER BY created_at DESC 
+                LIMIT 10
+            ''').fetchall()
         
-        revenue_result = conn.execute('SELECT SUM(estimated_price) FROM bookings WHERE status = "completed"').fetchone()
-        stats['total_revenue'] = revenue_result[0] if revenue_result[0] else 0
-        
-        # Réservations récentes
-        recent_bookings = conn.execute('''
-            SELECT * FROM bookings 
-            ORDER BY created_at DESC 
-            LIMIT 10
-        ''').fetchall()
-    
-    return render_template('admin_dashboard.html', stats=stats, recent_bookings=recent_bookings)
+        return render_template('admin_dashboard.html', stats=stats, recent_bookings=recent_bookings)
+    except Exception as e:
+        logger.error(f"Erreur dashboard admin: {e}")
+        return f"Erreur dashboard: {str(e)}", 500
 
 @app.route('/admin/bookings')
 @require_admin
 def admin_bookings():
     """Liste des réservations"""
-    with get_db_connection() as conn:
-        # Filtres
-        status_filter = request.args.get('status', '')
-        search = request.args.get('search', '')
+    try:
+        with get_db_connection() as conn:
+            # Filtres
+            status_filter = request.args.get('status', '')
+            search = request.args.get('search', '')
+            
+            query = 'SELECT * FROM bookings WHERE 1=1'
+            params = []
+            
+            if status_filter:
+                query += ' AND status = ?'
+                params.append(status_filter)
+            
+            if search:
+                query += ' AND (client_name LIKE ? OR client_email LIKE ? OR client_phone LIKE ?)'
+                search_param = f'%{search}%'
+                params.extend([search_param, search_param, search_param])
+            
+            query += ' ORDER BY created_at DESC'
+            
+            bookings = conn.execute(query, params).fetchall()
         
-        query = 'SELECT * FROM bookings WHERE 1=1'
-        params = []
-        
-        if status_filter:
-            query += ' AND status = ?'
-            params.append(status_filter)
-        
-        if search:
-            query += ' AND (client_name LIKE ? OR client_email LIKE ? OR client_phone LIKE ?)'
-            search_param = f'%{search}%'
-            params.extend([search_param, search_param, search_param])
-        
-        query += ' ORDER BY created_at DESC'
-        
-        bookings = conn.execute(query, params).fetchall()
-    
-    return render_template('admin_bookings.html', bookings=bookings, 
-                         status_filter=status_filter, search=search)
+        return render_template('admin_bookings.html', bookings=bookings, 
+                             status_filter=status_filter, search=search)
+    except Exception as e:
+        logger.error(f"Erreur liste réservations: {e}")
+        return f"Erreur réservations: {str(e)}", 500
 
 @app.route('/admin/booking/<int:booking_id>/update-status', methods=['POST'])
 @require_admin
@@ -458,10 +491,14 @@ def update_booking_status(booking_id):
 @require_admin
 def api_bookings():
     """API JSON des réservations"""
-    with get_db_connection() as conn:
-        bookings = conn.execute('SELECT * FROM bookings ORDER BY created_at DESC').fetchall()
-    
-    return jsonify([dict(booking) for booking in bookings])
+    try:
+        with get_db_connection() as conn:
+            bookings = conn.execute('SELECT * FROM bookings ORDER BY created_at DESC').fetchall()
+        
+        return jsonify([dict(booking) for booking in bookings])
+    except Exception as e:
+        logger.error(f"Erreur API bookings: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # Gestion des erreurs
 
