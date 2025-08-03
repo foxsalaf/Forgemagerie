@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🚚 2AV-Bagages - Plateforme de Transport PACA
 
 > Plateforme moderne de transport de bagages dans la région Aix-Marseille-Provence
@@ -343,3 +344,6 @@ open http://localhost:5000
 ---
 
 *Fait avec ❤️ pour moderniser le transport de bagages*
+=======
+# Forgemagerie
+>>>>>>> 4733cd6740087718bcefcf30cbdc980dfff60ad7
