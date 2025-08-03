@@ -41,7 +41,7 @@ Une application web complète pour analyser la rentabilité des forgemagie dans 
 ```env
 # Backend
 PORT=3001
-DATABASE_URL="file:./database.db"
+DATABASE_URL="postgresql://user:password@localhost:5432/forgemagerie"
 NODE_ENV="production"
 
 # APIs externes (optionnel)
@@ -68,7 +68,7 @@ Pour Railway, configurez ces variables dans votre dashboard :
 | Variable | Description | Valeur par défaut | Requis |
 |----------|-------------|-------------------|---------|
 | `PORT` | Port du serveur | `3001` | ✅ |
-| `DATABASE_URL` | URL de la base de données | `file:./database.db` | ✅ |
+| `DATABASE_URL` | URL de la base de données PostgreSQL | Fournie par Railway | ✅ |
 | `NODE_ENV` | Environnement | `production` | ✅ |
 | `NEXT_PUBLIC_API_URL` | URL de l'API pour le frontend | URL Railway | ✅ |
 | `FRONTEND_URL` | URL du frontend pour CORS | URL Railway | ✅ |
