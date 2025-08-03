@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Item {
+  id          Int      @id @default(autoincrement())
+  dofusId     Int      @unique
+  name        String
+  type        String
+  level       Int
+  baseStats   Json
+  maxStats    Json
+  weight      Int
+  puits       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  analyses    Analysis[]
+  prices      ItemPrice[]
+  
+  @@map("items")
+}
+
+model Rune {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  effect    String
+  weight    Int
+  density   Float
+  type      String   // "pa", "ra", "ga", "exo"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  prices    RunePrice[]
+  
+  @@map("runes")
+}
+
+model Analysis {
+  id              Int      @id @default(autoincrement())
+  itemId          Int
+  targetStats     Json
+  recommendedRunes Json
+  totalCost       Float
+  expectedProfit  Float
+  profitability   Float
+  scenarios       Json     // SC, SN, EC scenarios
+  createdAt       DateTime @default(now())
+  
+  item            Item     @relation(fields: [itemId], references: [id])
+  
+  @@map("analyses")
+}
+
+model ItemPrice {
+  id        Int      @id @default(autoincrement())
+  itemId    Int
+  price     Float
+  server    String   @default("global")
+  date      DateTime @default(now())
+  
+  item      Item     @relation(fields: [itemId], references: [id])
+  
+  @@map("item_prices")
+}
+
+model RunePrice {
+  id        Int      @id @default(autoincrement())
+  runeId    Int
+  price     Float
+  server    String   @default("global")
+  date      DateTime @default(now())
+  
+  rune      Rune     @relation(fields: [runeId], references: [id])
+  
+  @@map("rune_prices")
+}
+
+model UserFavorite {
+  id        Int      @id @default(autoincrement())
+  itemName  String
+  strategy  Json
+  userId    String   // Pour future authentification
+  createdAt DateTime @default(now())
+  
+  @@map("user_favorites")
+}

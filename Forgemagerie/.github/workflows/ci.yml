@@ -1,0 +1,128 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    name: Test Backend
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+        
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        npm ci
+        
+    - name: Run backend linting
+      run: |
+        cd backend
+        npm run lint
+        
+    - name: Run backend tests
+      run: |
+        cd backend
+        npm test
+        
+    - name: Build backend
+      run: |
+        cd backend
+        npm run build
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    name: Test Frontend
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Run frontend linting
+      run: |
+        cd frontend
+        npm run lint
+        
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm test
+        
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+
+  deploy:
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    name: Deploy to Railway
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to Railway
+      uses: railway-deploy/railway-deploy@v2
+      with:
+        service: forgemagerie-production
+        token: ${{ secrets.RAILWAY_TOKEN }}
+
+  lighthouse:
+    needs: [test-frontend]
+    runs-on: ubuntu-latest
+    name: Lighthouse Performance Check
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+        
+    - name: Lighthouse CI
+      uses: treosh/lighthouse-ci-action@v10
+      with:
+        configPath: './frontend/.lighthouserc.json'
+        uploadArtifacts: true
+        temporaryPublicStorage: true

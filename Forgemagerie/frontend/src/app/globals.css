@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.dofus-card {
+  @apply bg-gradient-to-br from-amber-50 to-yellow-100 border-2 border-amber-300 rounded-lg shadow-lg;
+}
+
+.dofus-button {
+  @apply bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:from-amber-600 hover:to-yellow-700 transition-all duration-200;
+}
+
+.stat-positive {
+  @apply text-green-600 font-semibold;
+}
+
+.stat-negative {
+  @apply text-red-600 font-semibold;
+}
+
+.stat-neutral {
+  @apply text-gray-700;
+}
