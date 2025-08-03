@@ -1,349 +1,293 @@
-<<<<<<< HEAD
-# 🚚 2AV-Bagages - Plateforme de Transport PACA
+# 🔨 Forgemagerie - Analyse de Rentabilité Dofus
 
-> Plateforme moderne de transport de bagages dans la région Aix-Marseille-Provence
+Une application web complète pour analyser la rentabilité des forgemagie dans le jeu Dofus. Optimisez vos profits de joaillomage en temps réel avec des recommandations intelligentes de runes et des calculs précis de rentabilité.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![Python](https://img.shields.io/badge/python-3.11+-green.svg)
-![Flask](https://img.shields.io/badge/flask-2.3+-red.svg)
-![License](https://img.shields.io/badge/license-MIT-yellow.svg)
+## 🌟 Fonctionnalités
 
-## 🎯 Vue d'ensemble
+### ✨ Analyse Complète
+- **Recherche d'objets** : Intégration avec l'API DofAPI pour accéder à tous les objets du jeu
+- **Calcul du puits** : Calculs précis selon les règles officielles de Dofus
+- **Recommandations de runes** : Sélection optimale des runes selon la densité et le coût
+- **Scénarios détaillés** : Analyse des probabilités SC/SN/EC avec profits estimés
 
-2AV-Bagages est une plateforme web moderne qui révolutionne le transport de bagages dans la région PACA. Elle remplace un ancien système WordPress défaillant par une solution rapide, fiable et moderne.
+### 📊 Interface Moderne
+- **Design responsive** : Interface adaptée desktop/mobile avec Tailwind CSS
+- **Thème Dofus** : Couleurs et style inspirés du jeu
+- **Temps réel** : Analyses instantanées avec indicateurs de chargement
+- **Données live** : Prix HDV mis à jour automatiquement
 
-### ✨ Fonctionnalités principales
+### 🔧 Architecture Robuste
+- **Backend TypeScript** : API REST sécurisée avec Express
+- **Frontend Next.js** : Application React avec Server-Side Rendering
+- **Base de données** : SQLite avec Prisma ORM
+- **Tests** : Couverture complète avec Jest
+- **CI/CD** : Pipeline automatisé avec GitHub Actions
 
-- **🎨 Interface moderne** avec design glassmorphism et animations fluides
-- **📱 Responsive design** optimisé mobile-first
-- **🔄 Réservation intelligente** avec formulaire multi-étapes
-- **💰 Calcul automatique** des tarifs selon distance et type
-- **📧 Notifications email** automatiques
-- **👨‍💼 Interface d'administration** complète
-- **📊 Dashboard** avec statistiques temps réel
-- **🚀 Déploiement facile** sur Railway avec Git
-
-## 🏗️ Architecture technique
-
-```
-Frontend: HTML5/CSS3/JavaScript (Vanilla)
-Backend: Python Flask
-Database: SQLite (PostgreSQL en production)
-Deployment: Railway + Git
-APIs: Google Maps, Email (SMTP)
-```
-
-## 📦 Installation rapide
+## 🚀 Déploiement Rapide sur Railway
 
 ### Prérequis
-- Python 3.11+
-- Git
-- Compte Railway (pour déploiement)
+- Compte [Railway](https://railway.app)
+- Repository GitHub connecté
 
-### 1. Cloner le projet
+### Configuration Railway
+
+1. **Créer un nouveau projet Railway**
 ```bash
-git clone https://github.com/votre-username/2av-bagages.git
-cd 2av-bagages
+# Connecter votre repository GitHub à Railway
 ```
 
-### 2. Environnement virtuel
-```bash
-python -m venv venv
+2. **Variables d'environnement à configurer** :
 
-# Windows
-venv\Scripts\activate
-
-# macOS/Linux
-source venv/bin/activate
-```
-
-### 3. Installer les dépendances
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configuration
-Créer un fichier `.env` :
 ```env
-SECRET_KEY=votre-cle-secrete-ultra-secure
-FLASK_ENV=development
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=votre-mot-de-passe-secure
-EMAIL_USER=2av.bagage@gmail.com
-EMAIL_PASS=votre-mot-de-passe-app-gmail
-GOOGLE_MAPS_API_KEY=votre-cle-google-maps
+# Backend
+PORT=3001
+DATABASE_URL="file:./database.db"
+NODE_ENV="production"
+
+# APIs externes (optionnel)
+DOFAPI_BASE_URL="https://api.dofusdb.fr"
+DOFUSDUDE_API_KEY=""
+
+# Frontend
+NEXT_PUBLIC_API_URL="https://votre-app.railway.app"
+
+# CORS
+FRONTEND_URL="https://votre-app.railway.app"
 ```
 
-### 5. Lancer l'application
+3. **Déploiement automatique**
 ```bash
-python app.py
+# Railway détecte automatiquement la configuration via railway.json
+# Le déploiement se fait automatiquement à chaque push sur main
 ```
 
-🎉 **L'application est disponible sur http://localhost:5000**
+### 🔧 Variables d'Environnement Requises
 
-## 🚀 Déploiement sur Railway
+Pour Railway, configurez ces variables dans votre dashboard :
 
-### 1. Préparer le repository
+| Variable | Description | Valeur par défaut | Requis |
+|----------|-------------|-------------------|---------|
+| `PORT` | Port du serveur | `3001` | ✅ |
+| `DATABASE_URL` | URL de la base de données | `file:./database.db` | ✅ |
+| `NODE_ENV` | Environnement | `production` | ✅ |
+| `NEXT_PUBLIC_API_URL` | URL de l'API pour le frontend | URL Railway | ✅ |
+| `FRONTEND_URL` | URL du frontend pour CORS | URL Railway | ✅ |
+| `DOFAPI_BASE_URL` | URL de l'API DofAPI | `https://api.dofusdb.fr` | ❌ |
+| `DOFUSDUDE_API_KEY` | Clé API DofusDude | `""` | ❌ |
+
+## 💻 Installation Locale
+
+### Prérequis
+- Node.js 18+ 
+- npm ou yarn
+
+### Installation
 ```bash
-git init
-git add .
-git commit -m "🚀 Initial deployment - 2AV Bagages"
-git remote add origin https://github.com/votre-username/2av-bagages.git
-git push -u origin main
+# Cloner le repository
+git clone https://github.com/foxsalaf/Forgemagerie.git
+cd Forgemagerie
+
+# Installer toutes les dépendances
+npm run install:all
+
+# Configuration environnement
+cp backend/.env.example backend/.env
+# Éditer backend/.env avec vos configurations
+
+# Initialiser la base de données
+cd backend
+npm run db:generate
+npm run db:migrate
+
+# Démarrer en développement
+cd ..
+npm run dev
 ```
 
-### 2. Connecter à Railway
-1. Aller sur [railway.app](https://railway.app)
-2. "New Project" → "Deploy from GitHub repo"
-3. Sélectionner votre repository
-4. Railway détecte automatiquement Flask via `Procfile`
+L'application sera accessible sur :
+- Frontend : http://localhost:3000
+- Backend API : http://localhost:3001
 
-### 3. Variables d'environnement
-Dans Railway Dashboard → Variables :
-```
-SECRET_KEY=votre-cle-production-ultra-secure
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=votre-mot-de-passe-production
-EMAIL_USER=2av.bagage@gmail.com
-EMAIL_PASS=votre-mot-de-passe-app-gmail
-GOOGLE_MAPS_API_KEY=votre-cle-google-maps-api
-```
-
-### 4. Déploiement automatique
-✅ Railway déploie automatiquement à chaque push sur `main`
-✅ HTTPS automatique avec certificat SSL
-✅ URL personnalisée disponible
-
-## 📋 Structure du projet
+## 📁 Structure du Projet
 
 ```
-2av-bagages/
-├── 🐍 app.py                    # Backend Flask principal
-├── 📋 requirements.txt          # Dépendances Python
-├── 🚀 Procfile                 # Configuration Railway
-├── 🐍 runtime.txt              # Version Python
-├── 🚫 .gitignore               # Fichiers à ignorer
-├── 📖 README.md                # Cette documentation
-├── 📁 templates/               # Templates HTML Jinja2
-│   ├── 🎨 base.html           # Template de base
-│   ├── 🏠 index.html          # Page d'accueil
-│   ├── 🔐 admin_login.html    # Connexion admin
-│   ├── 📊 admin_dashboard.html # Dashboard admin
-│   └── 📋 admin_bookings.html # Gestion réservations
-├── 📁 static/                  # Fichiers statiques (si besoin)
-│   ├── 🎨 css/
-│   ├── ⚡ js/
-│   └── 🖼️ images/
-└── 🗄️ bagages.db              # Base SQLite (auto-créée)
+forgemagerie/
+├── backend/                 # API Node.js/TypeScript
+│   ├── src/
+│   │   ├── controllers/     # Contrôleurs REST
+│   │   ├── services/        # Logique métier
+│   │   ├── routes/          # Routes Express
+│   │   ├── types/           # Types TypeScript
+│   │   └── __tests__/       # Tests unitaires
+│   ├── prisma/              # Schéma base de données
+│   └── package.json
+├── frontend/                # Application Next.js/React
+│   ├── src/
+│   │   ├── app/             # Pages Next.js 13+
+│   │   ├── components/      # Composants React
+│   │   ├── services/        # Clients API
+│   │   └── types/           # Types partagés
+│   └── package.json
+├── .github/workflows/       # CI/CD GitHub Actions
+├── railway.json             # Configuration Railway
+└── README.md
 ```
 
-## 🎨 Interface utilisateur
+## 🧪 Tests
 
-### 🏠 Page d'accueil
-- Design glassmorphism moderne
-- Particules animées en arrière-plan
-- Formulaire de réservation intelligent en 4 étapes
-- Calcul de prix en temps réel
-- Responsive parfait mobile/desktop
-
-### 👨‍💼 Interface admin
-- Dashboard avec statistiques
-- Gestion complète des réservations
-- Filtres et recherche en temps réel
-- Actions rapides (appel, email)
-- Export des données
-
-## 💾 Base de données
-
-### Table `bookings`
-```sql
-CREATE TABLE bookings (
-    id INTEGER PRIMARY KEY,
-    client_type TEXT NOT NULL,      -- pmr, famille, individuel
-    destination TEXT NOT NULL,      -- aeroport, gare, port, domicile
-    pickup_address TEXT NOT NULL,
-    pickup_datetime TEXT NOT NULL,
-    bag_count TEXT NOT NULL,
-    client_name TEXT NOT NULL,
-    client_email TEXT NOT NULL,
-    client_phone TEXT NOT NULL,
-    special_instructions TEXT,
-    estimated_price REAL,
-    status TEXT DEFAULT 'pending',  -- pending, confirmed, completed, cancelled
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### Table `pricing`
-```sql
-CREATE TABLE pricing (
-    id INTEGER PRIMARY KEY,
-    client_type TEXT NOT NULL,
-    destination TEXT NOT NULL,
-    base_price REAL NOT NULL,
-    km_rate REAL NOT NULL,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-## 🔧 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/` | Page d'accueil |
-| `POST` | `/book` | Nouvelle réservation |
-| `POST` | `/calculate-price` | Calcul de prix |
-| `GET` | `/admin` | Dashboard admin |
-| `GET` | `/admin/bookings` | Liste réservations |
-| `POST` | `/admin/booking/<id>/update-status` | Mise à jour statut |
-| `GET` | `/api/bookings` | API JSON réservations |
-
-## ⚙️ Configuration avancée
-
-### Email avec Gmail
-1. Activer l'authentification à 2 facteurs
-2. Générer un "Mot de passe d'application"
-3. Utiliser ce mot de passe dans `EMAIL_PASS`
-
-### Google Maps API
-1. Aller sur [Google Cloud Console](https://console.cloud.google.com)
-2. Activer "Distance Matrix API"
-3. Créer une clé API
-4. Ajouter dans `GOOGLE_MAPS_API_KEY`
-
-### Base de données PostgreSQL (production)
-```env
-DATABASE_URL=postgresql://user:pass@host:port/dbname
-```
-
-## 🎯 Tarification intelligente
-
-Le système calcule automatiquement les prix selon :
-
-- **Type de client** : PMR (réduction), Famille (majoration), Individuel (standard)
-- **Destination** : Aéroport, Gare, Port, Domicile
-- **Distance** : Calcul automatique Google Maps
-- **Nombre de bagages** : Multiplicateur selon quantité
-
-### Exemple de calcul
-```python
-Prix = (Prix_base + Distance_km × Taux_km) × Multiplicateur_bagages
-```
-
-## 🔮 Fonctionnalités futures (v2.0)
-
-- [ ] 🗺️ **Géolocalisation temps réel** des véhicules
-- [ ] 🤖 **IA de tarification** dynamique selon demande
-- [ ] 📱 **Application mobile** native iOS/Android
-- [ ] 🏷️ **QR codes** pour traçabilité bagages
-- [ ] ⭐ **Système de notation** client/chauffeur
-- [ ] 💳 **Paiement en ligne** Stripe
-- [ ] 📈 **Analytics avancés** et reporting
-- [ ] 🌍 **Multi-langues** (anglais, italien)
-- [ ] 🔔 **Notifications push** en temps réel
-- [ ] 📊 **API publique** pour partenaires
-
-## 🛠️ Maintenance et monitoring
-
-### Logs d'application
 ```bash
-# Voir les logs Railway
-railway logs
+# Tests backend
+cd backend
+npm test
 
-# Logs locaux
-tail -f app.log
+# Tests frontend  
+cd frontend
+npm test
+
+# Couverture de code
+npm run test -- --coverage
 ```
 
-### Sauvegarde base de données
-```python
-# Script de sauvegarde automatique
-import sqlite3
-import datetime
+## 📚 API Documentation
 
-def backup_database():
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    os.system(f"cp bagages.db backup_bagages_{timestamp}.db")
+### Endpoints Principaux
+
+#### `POST /api/analysis/analyze`
+Analyse complète d'un objet pour forgemagie.
+
+```json
+{
+  "itemName": "Gelano",
+  "targetStats": {
+    "vitalite": 350,
+    "agilite": 60
+  },
+  "statsASupprimer": {
+    "sagesse": 20
+  }
+}
 ```
 
-### Monitoring performances
-- Railway fournit automatiquement les métriques
-- Monitoring uptime inclus
-- Alertes automatiques en cas de problème
+#### `GET /api/analysis/search?query=gelano`
+Recherche d'objets par nom.
 
-## 🔒 Sécurité
+#### `GET /api/analysis/runes?type=ra&effect=vitalite`
+Obtention des runes disponibles avec filtres.
 
-### Mesures implémentées
-- ✅ Hash des mots de passe admin
-- ✅ Protection CSRF
-- ✅ Validation côté serveur
-- ✅ Échappement XSS automatique (Jinja2)
-- ✅ Variables d'environnement pour secrets
-- ✅ HTTPS automatique (Railway)
+#### `POST /api/analysis/calculate-puits`
+Calcul du puits nécessaire pour des statistiques données.
 
-### Bonnes pratiques
-```python
-# Jamais de secrets dans le code
-SECRET_KEY = os.environ.get('SECRET_KEY')
-
-# Validation stricte des entrées
-email = request.json.get('email')
-if not email or '@' not in email:
-    return jsonify({'error': 'Email invalide'}), 400
+### Format de Réponse
+```json
+{
+  "success": true,
+  "data": {
+    "item": { /* Objet Dofus */ },
+    "targetStats": { /* Stats cibles */ },
+    "recommendedRunes": [ /* Runes recommandées */ ],
+    "totalCost": 150000,
+    "expectedProfit": 75000,
+    "profitability": 33.5,
+    "scenarios": [ /* Scénarios SC/SN/EC */ ],
+    "puitsUtilise": 85,
+    "puitsDisponible": 100
+  }
+}
 ```
 
-## 📞 Support et contact
+## 🔧 Configuration Avancée
 
-### Informations business
-- **Téléphone** : (+33) 6-63-49-70-64
-- **Email** : 2av.bagage@gmail.com
-- **Zone** : Métropole Aix-Marseille-Provence
+### Personnalisation des Calculs
 
-### Support technique
-- **Issues GitHub** : [Créer un ticket](https://github.com/votre-username/2av-bagages/issues)
-- **Documentation** : Ce README
-- **Communauté** : [Discussions GitHub](https://github.com/votre-username/2av-bagages/discussions)
+Les règles de forgemagie sont configurables dans `backend/src/services/forge-magic.ts` :
+
+```typescript
+const config: ForgemagieConfig = {
+  maxOverStats: {
+    'vitalite': 40,
+    'pa': 1,
+    // ...
+  },
+  runeWeights: {
+    'vitalite': 0.2,
+    'pa': 100,
+    // ...
+  }
+};
+```
+
+### Ajout de Nouvelles Runes
+
+Modifier `backend/src/services/runes.service.ts` pour ajouter de nouvelles runes :
+
+```typescript
+{ 
+  id: 200, 
+  name: 'Nouvelle Rune', 
+  effect: 'stat', 
+  weight: 10, 
+  density: 0.1, 
+  type: 'ra', 
+  price: 1000 
+}
+```
+
+## 🐛 Dépannage
+
+### Problèmes Courants
+
+**Erreur de connexion API**
+```bash
+# Vérifier les variables d'environnement
+echo $NEXT_PUBLIC_API_URL
+```
+
+**Base de données non initialisée**
+```bash
+cd backend
+npx prisma db push
+```
+
+**Erreurs de build**
+```bash
+# Nettoyer les caches
+rm -rf node_modules package-lock.json
+npm install
+```
+
+## 🤝 Contribution
+
+1. Fork le projet
+2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
+3. Commit les changements (`git commit -m 'Add AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrir une Pull Request
+
+### Guidelines de Développement
+
+- **Tests** : Maintenir 80%+ de couverture de code
+- **TypeScript** : Typage strict obligatoire
+- **Commits** : Messages conventionnels (feat:, fix:, docs:)
+- **Code Style** : ESLint + Prettier pour la cohérence
 
 ## 📄 Licence
 
-MIT License - voir [LICENSE](LICENSE) pour plus de détails.
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ## 🙏 Remerciements
 
-- **Design inspiration** : Glassmorphism trend 2024
-- **Framework** : Flask ecosystem
-- **Hosting** : Railway.app
-- **Icons** : Font Awesome
-- **Typography** : Inter font family
+- **DofAPI** : Données des objets Dofus
+- **DofusDude** : API alternative pour les données
+- **Communauté Dofus** : Feedback et suggestions
+- **Railway** : Hébergement cloud simplifié
+
+## 📞 Support
+
+- **Issues GitHub** : [Créer un ticket](https://github.com/foxsalaf/Forgemagerie/issues)
+- **Discussions** : [Forum du projet](https://github.com/foxsalaf/Forgemagerie/discussions)
 
 ---
 
-## 🚀 Lancement rapide
+**⚡ Développé avec passion pour la communauté Dofus !**
 
-```bash
-# 1. Cloner
-git clone https://github.com/votre-username/2av-bagages.git
-cd 2av-bagages
-
-# 2. Installer
-pip install -r requirements.txt
-
-# 3. Configurer
-cp .env.example .env
-# Éditer .env avec vos valeurs
-
-# 4. Lancer
-python app.py
-
-# 5. Ouvrir
-open http://localhost:5000
-```
-
-**🎉 Prêt à révolutionner le transport de bagages dans le PACA !**
-
----
-
-*Fait avec ❤️ pour moderniser le transport de bagages*
-=======
-# Forgemagerie
->>>>>>> 4733cd6740087718bcefcf30cbdc980dfff60ad7
+🌟 N'hésitez pas à ⭐ ce projet s'il vous aide à optimiser vos forgemagie !
