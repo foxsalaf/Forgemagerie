@@ -5,32 +5,45 @@ const path = require('path');
 
 console.log('🚀 Starting deployment process...');
 
+// Function to run command with error handling
+function runCommand(command, cwd = process.cwd()) {
+  console.log(`Running: ${command} in ${cwd}`);
+  try {
+    execSync(command, { stdio: 'inherit', cwd });
+  } catch (error) {
+    console.error(`❌ Command failed: ${command}`);
+    throw error;
+  }
+}
+
 try {
-  // Change to backend directory
-  const backendDir = path.join(__dirname, '..', 'backend');
-  process.chdir(backendDir);
+  const rootDir = path.join(__dirname, '..');
+  const backendDir = path.join(rootDir, 'backend');
+  const frontendDir = path.join(rootDir, 'frontend');
   
+  // Install root dependencies first
+  console.log('📦 Installing root dependencies...');
+  runCommand('npm install', rootDir);
+  
+  // Backend setup
   console.log('📦 Installing backend dependencies...');
-  execSync('npm install', { stdio: 'inherit' });
+  runCommand('npm install', backendDir);
   
   console.log('🗄️ Generating Prisma client...');
-  execSync('npx prisma generate', { stdio: 'inherit' });
+  runCommand('npx prisma generate', backendDir);
   
   console.log('🗄️ Pushing database schema...');
-  execSync('npx prisma db push', { stdio: 'inherit' });
+  runCommand('npx prisma db push', backendDir);
   
   console.log('🏗️ Building backend...');
-  execSync('npm run build', { stdio: 'inherit' });
+  runCommand('npm run build', backendDir);
   
-  // Change to frontend directory
-  const frontendDir = path.join(__dirname, '..', 'frontend');
-  process.chdir(frontendDir);
-  
+  // Frontend setup
   console.log('📦 Installing frontend dependencies...');
-  execSync('npm install', { stdio: 'inherit' });
+  runCommand('npm install', frontendDir);
   
   console.log('🏗️ Building frontend...');
-  execSync('npm run build', { stdio: 'inherit' });
+  runCommand('npm run build', frontendDir);
   
   console.log('✅ Deployment process completed successfully!');
   

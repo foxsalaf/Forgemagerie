@@ -2,7 +2,7 @@
   "name": "forgemagerie-dofus",
   "version": "1.0.0",
   "description": "Application d'analyse de rentabilité pour la forgemagie Dofus",
-  "main": "backend/src/server.js",
+  "main": "backend/dist/server.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
