@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import analysisRoutes from './routes/analysis.routes';
+import assistantRoutes from './routes/assistant.routes';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use('/api/analysis', analysisRoutes);
+app.use('/api/assistant', assistantRoutes);
 
 // Serve static frontend files
 const frontendPath = path.join(__dirname, '../../frontend/.next/standalone');
@@ -87,6 +89,8 @@ app.get('/', (req, res) => {
           <div class="endpoint">GET /api/analysis/search?query=gelano - Rechercher objets</div>
           <div class="endpoint">GET /api/analysis/runes - Obtenir les runes</div>
           <div class="endpoint">POST /api/analysis/analyze - Analyser un objet</div>
+          <div class="endpoint">POST /api/assistant/recommendations - Assistant IA</div>
+          <div class="endpoint">GET /api/assistant/market-insights - Insights marché</div>
           
           <div style="margin-top: 2rem;">
             <a href="/health" class="btn">🏥 Health Check</a>

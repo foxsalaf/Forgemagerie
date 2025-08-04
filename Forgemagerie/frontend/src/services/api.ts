@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiResponse, ForgemagieAnalysis, SearchResult, DofusItem, Rune } from '@/types';
+import { ApiResponse, ForgemagieAnalysis, SearchResult, DofusItem, Rune, AssistantRequest, AssistantResponse, MarketInsights } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -65,6 +65,39 @@ export const analysisApi = {
       throw new Error(response.data.error || 'Erreur lors du calcul du puits');
     }
     return response.data.data;
+  }
+};
+
+export const assistantApi = {
+  getRecommendations: async (request: AssistantRequest): Promise<AssistantResponse> => {
+    const response = await api.post<ApiResponse<AssistantResponse>>('/assistant/recommendations', request);
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Erreur lors de la génération des recommandations');
+    }
+    return response.data.data;
+  },
+
+  getMarketInsights: async (server: string = 'global'): Promise<MarketInsights> => {
+    const response = await api.get<ApiResponse<MarketInsights>>('/assistant/market-insights', {
+      params: { server }
+    });
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Erreur lors de la récupération des insights marché');
+    }
+    return response.data.data;
+  },
+
+  validateBudget: async (budget: number, riskTolerance: string = 'modere'): Promise<{
+    valid: boolean;
+    category: string;
+    recommendation: string;
+    suggestedMinBudget?: number;
+  }> => {
+    const response = await api.post('/assistant/validate-budget', {
+      budget,
+      riskTolerance
+    });
+    return response.data;
   }
 };
 

@@ -82,3 +82,34 @@ export interface ForgemagieConfig {
   runeWeights: Record<string, number>;
   baseWeights: Record<string, number>;
 }
+
+export interface AssistantRecommendation {
+  item: DofusItem;
+  analysis: ForgemagieAnalysis;
+  profitMargin: number;
+  investmentReturn: number;
+  difficulty: 'facile' | 'moyen' | 'difficile';
+  estimatedTime: number;
+  reasoning: string;
+}
+
+export interface AssistantRequest {
+  server: string;
+  budget: number;
+  preferredStats: string[];
+  riskTolerance: 'conservateur' | 'modere' | 'agressif';
+  minProfitMargin?: number;
+  maxItemLevel?: number;
+  excludedTypes?: string[];
+}
+
+export interface AssistantResponse {
+  recommendations: AssistantRecommendation[];
+  totalBudgetUsed: number;
+  estimatedTotalProfit: number;
+  marketAnalysis: {
+    bestOpportunities: string[];
+    marketTrends: string[];
+    warnings: string[];
+  };
+}

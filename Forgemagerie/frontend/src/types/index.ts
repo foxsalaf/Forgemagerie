@@ -50,3 +50,58 @@ export interface ApiResponse<T> {
   data: T;
   error?: string;
 }
+
+export interface AssistantRecommendation {
+  item: DofusItem;
+  analysis: ForgemagieAnalysis;
+  profitMargin: number;
+  investmentReturn: number;
+  difficulty: 'facile' | 'moyen' | 'difficile';
+  estimatedTime: number;
+  reasoning: string;
+}
+
+export interface AssistantRequest {
+  server: string;
+  budget: number;
+  preferredStats: string[];
+  riskTolerance: 'conservateur' | 'modere' | 'agressif';
+  minProfitMargin?: number;
+  maxItemLevel?: number;
+  excludedTypes?: string[];
+}
+
+export interface AssistantResponse {
+  recommendations: AssistantRecommendation[];
+  totalBudgetUsed: number;
+  estimatedTotalProfit: number;
+  marketAnalysis: {
+    bestOpportunities: string[];
+    marketTrends: string[];
+    warnings: string[];
+  };
+}
+
+export interface MarketInsights {
+  hotItems: Array<{
+    type: string;
+    demand: 'low' | 'medium' | 'high';
+    reason: string;
+  }>;
+  profitableStats: Array<{
+    stat: string;
+    avgProfit: number;
+    difficulty: 'facile' | 'moyen' | 'difficile';
+  }>;
+  budgetRecommendations: {
+    beginner: { min: number; recommended: number; description: string };
+    intermediate: { min: number; recommended: number; description: string };
+    advanced: { min: number; recommended: number; description: string };
+  };
+  serverSpecific: {
+    server: string;
+    marketActivity: string;
+    bestTimeToSell: string;
+    competitionLevel: string;
+  };
+}
