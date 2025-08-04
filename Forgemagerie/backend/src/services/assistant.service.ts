@@ -1,6 +1,7 @@
 import { DofapiService } from './dofapi.service';
 import { RunesService } from './runes.service';
 import { ForgemagieService } from './forgemagerie.service';
+import { MockDataService } from './mock-data.service';
 import { 
   AssistantRequest, 
   AssistantResponse, 
@@ -29,23 +30,35 @@ export class AssistantService {
     const popularItems = await this.findPopularJewelryItems(request);
 
     // Étape 2: Analyser chaque item potentiel
+    console.log(`🔍 Analyse de ${popularItems.length} items populaires`);
+    
     for (const item of popularItems) {
       if (totalBudgetUsed >= request.budget * 0.9) break;
 
       try {
-        const itemPrice = await this.dofapiService.getItemPrices(item.id);
+        console.log(`📊 Analyse de l'item: ${item.name} (${item.type})`);
+        const itemPrice = await this.dofapiService.getItemPrices(item.id, request.server);
+        console.log(`💰 Prix de l'item: ${itemPrice} kamas`);
         
-        if (itemPrice > request.budget - totalBudgetUsed) continue;
+        if (itemPrice > request.budget - totalBudgetUsed) {
+          console.log(`❌ Item trop cher: ${itemPrice} > ${request.budget - totalBudgetUsed}`);
+          continue;
+        }
 
         // Générer des stratégies de FM optimales
         const strategies = this.generateFMStrategies(item, request.preferredStats);
+        console.log(`🎯 ${strategies.length} stratégies générées pour ${item.name}`);
 
         for (const strategy of strategies) {
+          console.log(`🔧 Test de stratégie:`, strategy.targetStats);
+          
           const analysis = await this.forgemagieService.analyzeForgemagerie({
             item,
             targetStats: strategy.targetStats,
             statsASupprimer: strategy.statsASupprimer || {}
           });
+          
+          console.log(`📈 Analyse terminée - Profit: ${analysis.expectedProfit}, Coût: ${analysis.totalCost}, Rentabilité: ${analysis.profitability}%`);
 
           if (analysis.expectedProfit > 0 && 
               analysis.totalCost <= (request.budget - totalBudgetUsed) &&
@@ -85,6 +98,51 @@ export class AssistantService {
   }
 
   private async findPopularJewelryItems(request: AssistantRequest): Promise<DofusItem[]> {
+    // Pour le serveur Retro, utiliser toujours nos données spécialisées
+    // Pour les autres serveurs, essayer DofAPI puis fallback
+    if (request.server === 'retro') {
+      console.log('🏛️ Mode Retro : utilisation des données spécialisées Retro');
+      const mockItems = MockDataService.getRetroItems();
+      
+      return mockItems
+        .filter(item => {
+          // Filtrer par niveau max
+          if (request.maxItemLevel && item.level > request.maxItemLevel) return false;
+          
+          // Filtrer les types exclus
+          if (request.excludedTypes?.includes(item.type)) return false;
+          
+          // Filtrer par potentiel FM
+          return this.hasGoodFMPotential(item, request.preferredStats);
+        })
+        .slice(0, 10);
+    }
+
+    // Mode production : essayer DofAPI puis fallback sur données génériques
+    console.log('🌐 Tentative de récupération via DofAPI...');
+    try {
+      const dofapiItems = await this.tryDofApiSearch(request);
+      if (dofapiItems.length > 0) {
+        console.log(`✅ ${dofapiItems.length} items récupérés via DofAPI`);
+        return dofapiItems;
+      }
+    } catch (error) {
+      console.warn('⚠️ DofAPI indisponible, fallback sur données locales');
+    }
+
+    // Fallback : données locales génériques
+    console.log('🔄 Utilisation des données locales génériques');
+    const fallbackItems = MockDataService.getMockItems();
+    return fallbackItems
+      .filter(item => {
+        if (request.maxItemLevel && item.level > request.maxItemLevel) return false;
+        if (request.excludedTypes?.includes(item.type)) return false;
+        return this.hasGoodFMPotential(item, request.preferredStats);
+      })
+      .slice(0, 10);
+  }
+
+  private async tryDofApiSearch(request: AssistantRequest): Promise<DofusItem[]> {
     const jewelryTypes = [
       'Amulette', 'Anneau', 'Bottes', 'Ceinture', 'Cape',
       'Coiffe', 'Épée', 'Dague', 'Arc', 'Bâton', 'Marteau',
@@ -93,16 +151,18 @@ export class AssistantService {
 
     const items: DofusItem[] = [];
 
-    for (const type of jewelryTypes) {
-      if (request.excludedTypes?.includes(type)) continue;
-
+    // Essayer quelques recherches ciblées
+    const searches = ['anneau', 'gelano', 'amulette', 'bottes'];
+    
+    for (const searchTerm of searches) {
       try {
-        const searchResults = await this.dofapiService.searchItem(type);
+        const searchResults = await this.dofapiService.searchItem(searchTerm);
         
-        for (const result of searchResults.slice(0, 10)) {
+        for (const result of searchResults.slice(0, 5)) {
           const dofusItem = this.dofapiService.convertToDofusItem(result);
           
           if (request.maxItemLevel && dofusItem.level > request.maxItemLevel) continue;
+          if (request.excludedTypes?.includes(dofusItem.type)) continue;
           
           // Filtrer les items avec un bon potentiel de FM
           if (this.hasGoodFMPotential(dofusItem, request.preferredStats)) {
@@ -110,18 +170,28 @@ export class AssistantService {
           }
         }
       } catch (error) {
-        console.error(`Erreur lors de la recherche d'items ${type}:`, error);
+        console.error(`Erreur lors de la recherche '${searchTerm}':`, error);
+        // Continuer avec les autres recherches
       }
     }
 
-    return items.slice(0, 50);
+    return items.slice(0, 20);
   }
 
   private hasGoodFMPotential(item: DofusItem, preferredStats: string[]): boolean {
     const itemStats = Object.keys(item.maxStats);
-    const hasPreferredStats = preferredStats.some(stat => itemStats.includes(stat));
+    const hasPreferredStats = preferredStats.length === 0 || preferredStats.some(stat => itemStats.includes(stat));
     const hasRoomForImprovement = item.puits >= 50;
-    const goodStatCount = itemStats.length >= 3;
+    const goodStatCount = itemStats.length >= 2;
+
+    console.log(`🔍 Potentiel FM pour ${item.name}:`, {
+      itemStats,
+      preferredStats,
+      hasPreferredStats,
+      hasRoomForImprovement,
+      goodStatCount,
+      result: hasPreferredStats && hasRoomForImprovement && goodStatCount
+    });
 
     return hasPreferredStats && hasRoomForImprovement && goodStatCount;
   }

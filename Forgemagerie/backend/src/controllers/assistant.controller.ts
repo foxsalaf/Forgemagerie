@@ -88,8 +88,8 @@ export class AssistantController {
     try {
       const { server = 'global' } = req.query;
 
-      // Simulation d'insights du marché basé sur des données historiques
-      const insights = {
+      // Insights spéciaux pour le serveur Retro
+      const insights = server === 'retro' ? this.getRetroMarketInsights() : {
         hotItems: [
           { type: 'Amulette', demand: 'high', reason: 'Stats PA/PM très recherchées' },
           { type: 'Anneau', demand: 'medium', reason: 'Marché stable pour résistances' },
@@ -127,6 +127,39 @@ export class AssistantController {
         error: 'Erreur lors de la récupération des insights marché'
       });
     }
+  }
+
+  private getRetroMarketInsights() {
+    return {
+      hotItems: [
+        { type: 'Amulette', demand: 'high', reason: 'Amulettes PA très recherchées par les classes de mêlée' },
+        { type: 'Anneau', demand: 'high', reason: 'Gelano et Dragoeufs sont les références' },
+        { type: 'Bottes', demand: 'medium', reason: 'PM et résistances importantes' },
+        { type: 'Dague', demand: 'high', reason: 'Classes Agi très populaires en Retro' },
+        { type: 'Bâton', demand: 'medium', reason: 'Classes Int recherchent PM et puissance' }
+      ],
+      profitableStats: [
+        { stat: 'pa', avgProfit: 55, difficulty: 'difficile' },
+        { stat: 'pm', avgProfit: 48, difficulty: 'difficile' },
+        { stat: 'vitalite', avgProfit: 22, difficulty: 'facile' },
+        { stat: 'force', avgProfit: 32, difficulty: 'moyen' },
+        { stat: 'agilite', avgProfit: 35, difficulty: 'moyen' },
+        { stat: 'intelligence', avgProfit: 30, difficulty: 'moyen' },
+        { stat: 'puissance', avgProfit: 28, difficulty: 'moyen' }
+      ],
+      budgetRecommendations: {
+        beginner: { min: 30000, recommended: 80000, description: 'Items Retro niveau 60-80, bonnes marges' },
+        intermediate: { min: 150000, recommended: 300000, description: 'Diversification sur plusieurs slots' },
+        advanced: { min: 500000, recommended: 1000000, description: 'Items haut niveau et stratégies PA/PM' }
+      },
+      serverSpecific: {
+        server: 'retro' as string,
+        marketActivity: 'très actif',
+        bestTimeToSell: '19h-23h',
+        competitionLevel: 'élevé',
+        specialNotes: 'Économie mature, privilégier la qualité. PA/PM très valorisés.'
+      }
+    };
   }
 
   async validateBudget(req: Request, res: Response) {

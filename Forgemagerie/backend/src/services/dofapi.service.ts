@@ -4,33 +4,119 @@ import { DofusItem, DofapiItem } from '../types';
 export class DofapiService {
   private readonly baseUrl: string;
   private readonly axiosInstance;
+  private apiAvailable: boolean = true;
 
   constructor() {
-    this.baseUrl = process.env.DOFAPI_BASE_URL || 'https://api.dofusdb.fr';
+    // Utiliser la vraie DofAPI maintenant
+    this.baseUrl = process.env.DOFAPI_BASE_URL || 'https://fr.dofus.dofapi.fr';
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,
-      timeout: 10000,
+      timeout: 8000, // Plus court pour éviter les timeouts
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'Forgemagerie-App/1.0'
       }
     });
+
+    // Interceptor pour gérer les erreurs
+    this.axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND') {
+          console.warn('🚨 DofAPI indisponible, basculement vers données locales');
+          this.apiAvailable = false;
+        }
+        throw error;
+      }
+    );
   }
 
   async searchItem(query: string): Promise<DofapiItem[]> {
-    try {
-      const response = await this.axiosInstance.get('/items', {
-        params: {
-          'filter[name_like]': query,
-          'page[size]': 20
-        }
-      });
+    if (!this.apiAvailable) {
+      console.log('🔄 API indisponible, utilisation des données locales');
+      return this.searchLocalItems(query);
+    }
 
-      return response.data.data || [];
+    try {
+      // Essayer d'abord equipments puis weapons
+      let response;
+      try {
+        response = await this.axiosInstance.get('/equipments');
+      } catch (err) {
+        console.log('🔄 Tentative avec /weapons...');
+        response = await this.axiosInstance.get('/weapons');
+      }
+
+      if (!response.data) {
+        console.warn('🚨 Pas de données reçues de DofAPI');
+        return this.searchLocalItems(query);
+      }
+
+      // Filtrer localement par nom
+      const items = Array.isArray(response.data) ? response.data : [];
+      const filtered = items.filter((item: any) => 
+        item.name && item.name.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 20);
+
+      return this.convertToDofapiFormat(filtered);
     } catch (error) {
       console.error('Erreur lors de la recherche d\'objets:', error);
-      throw new Error('Impossible de rechercher les objets');
+      this.apiAvailable = false;
+      return this.searchLocalItems(query);
     }
+  }
+
+  private searchLocalItems(query: string): DofapiItem[] {
+    const { MockDataService } = require('./mock-data.service');
+    const localItems = MockDataService.getRetroItems();
+    
+    return localItems
+      .filter((item: DofusItem) => 
+        item.name.toLowerCase().includes(query.toLowerCase()) ||
+        item.type.toLowerCase().includes(query.toLowerCase())
+      )
+      .slice(0, 20)
+      .map((item: DofusItem) => this.convertLocalToDofapi(item));
+  }
+
+  private convertToDofapiFormat(items: any[]): DofapiItem[] {
+    return items.map((item: any) => ({
+      id: item._id || item.id,
+      name: { fr: item.name, en: item.name },
+      type: { name: { fr: item.type || 'Equipment', en: item.type || 'Equipment' } },
+      level: item.level || 1,
+      statistics: this.extractStatistics(item)
+    }));
+  }
+
+  private convertLocalToDofapi(item: DofusItem): DofapiItem {
+    return {
+      id: item.id,
+      name: { fr: item.name, en: item.name },
+      type: { name: { fr: item.type, en: item.type } },
+      level: item.level,
+      statistics: Object.entries(item.baseStats).map(([key, value]) => ({
+        characteristic: { name: { fr: key, en: key } },
+        from: value,
+        to: item.maxStats[key] || value
+      }))
+    };
+  }
+
+  private extractStatistics(item: any): Array<{
+    characteristic: { name: { fr: string; en: string } };
+    from: number;
+    to?: number;
+  }> {
+    if (!item.characteristics) return [];
+    
+    return item.characteristics.map((char: any) => ({
+      characteristic: {
+        name: { fr: char.name || 'stat', en: char.name || 'stat' }
+      },
+      from: char.min || char.value || 0,
+      to: char.max || char.value || undefined
+    }));
   }
 
   async getItemById(id: number): Promise<DofapiItem | null> {
@@ -138,15 +224,42 @@ export class DofapiService {
     return weights[statName] || 1;
   }
 
-  async getItemPrices(itemId: number): Promise<number> {
+  async getItemPrices(itemId: number, server: string = 'global'): Promise<number> {
     try {
       await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Prix spéciaux pour le serveur Retro (économie différente)
+      if (server === 'retro') {
+        return this.getRetroItemPrice(itemId);
+      }
       
       const basePrice = Math.floor(Math.random() * 100000) + 10000;
       return basePrice;
     } catch (error) {
       console.error(`Erreur lors de la récupération du prix pour l'objet ${itemId}:`, error);
-      return 50000;
+      return server === 'retro' ? 25000 : 50000;
     }
+  }
+
+  private getRetroItemPrice(itemId: number): number {
+    // Prix typiques des items populaires sur le serveur Retro
+    const retroPrices: Record<number, number> = {
+      101: 45000,   // Gelano
+      102: 85000,   // Anneau des Dragoeufs
+      103: 120000,  // Bottes du Bouftou Royal
+      104: 180000,  // Cape Bourbisk
+      105: 150000,  // Amulette du Minotot
+      106: 95000,   // Ceinture du Blop Royal
+      107: 110000,  // Coiffe Lynx
+      108: 75000,   // Dague du Crâne
+      109: 135000,  // Bâton de Meriana
+      110: 85000    // Bouclier du Minotot
+    };
+
+    const basePrice = retroPrices[itemId] || 50000;
+    
+    // Variation de marché ±15%
+    const variation = (Math.random() - 0.5) * 0.3;
+    return Math.round(basePrice * (1 + variation));
   }
 }

@@ -4,7 +4,17 @@
       "Bash(mkdir:*)",
       "Bash(ls:*)",
       "Bash(git branch:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm install)",
+      "Bash(npx ts-node:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:dofapi.fr)",
+      "Bash(pkill:*)",
+      "Bash(npm run build:*)",
+      "Bash(fuser:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }

@@ -47,7 +47,7 @@ const ITEM_TYPES = [
 ];
 
 const SERVERS = [
-  'global', 'Agride', 'Allister', 'Brumen', 'Grandapan', 'Hellmina', 
+  'retro', 'global', 'Agride', 'Allister', 'Brumen', 'Grandapan', 'Hellmina', 
   'Ily', 'Jahash', 'Merkator', 'Nidas', 'Oto-Mustam', 'Padgref', 
   'Rubilax', 'Ryuku', 'Temporis', 'Tylezia'
 ];
@@ -62,7 +62,7 @@ export default function AssistantJoaillomagerie() {
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     defaultValues: {
-      server: 'global',
+      server: 'retro',
       budget: 100000,
       riskTolerance: 'modere',
       minProfitMargin: 15,
