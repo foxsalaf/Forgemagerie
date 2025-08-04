@@ -2,6 +2,7 @@ import { DofapiService } from './dofapi.service';
 import { RunesService } from './runes.service';
 import { ForgemagieService } from './forgemagerie.service';
 import { MockDataService } from './mock-data.service';
+import { RetroDatabaseService } from './retro-database.service';
 import { 
   AssistantRequest, 
   AssistantResponse, 
@@ -14,11 +15,13 @@ export class AssistantService {
   private dofapiService: DofapiService;
   private runesService: RunesService;
   private forgemagieService: ForgemagieService;
+  private retroDb: RetroDatabaseService;
 
   constructor() {
     this.dofapiService = new DofapiService();
     this.runesService = new RunesService();
     this.forgemagieService = new ForgemagieService();
+    this.retroDb = new RetroDatabaseService();
   }
 
   async getRecommendations(request: AssistantRequest): Promise<AssistantResponse> {
@@ -98,24 +101,25 @@ export class AssistantService {
   }
 
   private async findPopularJewelryItems(request: AssistantRequest): Promise<DofusItem[]> {
-    // Pour le serveur Retro, utiliser toujours nos données spécialisées
-    // Pour les autres serveurs, essayer DofAPI puis fallback
+    // Pour le serveur Retro, utiliser TOUJOURS notre base de données complète
     if (request.server === 'retro') {
-      console.log('🏛️ Mode Retro : utilisation des données spécialisées Retro');
-      const mockItems = MockDataService.getRetroItems();
+      console.log('🏛️ Mode Retro : utilisation de la base de données complète');
       
-      return mockItems
+      const items = this.retroDb.advancedSearch({
+        maxLevel: request.maxItemLevel,
+        maxPrice: request.budget,
+        requiredStats: request.preferredStats.length > 0 ? request.preferredStats : undefined
+      });
+
+      return items
         .filter(item => {
-          // Filtrer par niveau max
-          if (request.maxItemLevel && item.level > request.maxItemLevel) return false;
-          
           // Filtrer les types exclus
           if (request.excludedTypes?.includes(item.type)) return false;
           
           // Filtrer par potentiel FM
           return this.hasGoodFMPotential(item, request.preferredStats);
         })
-        .slice(0, 10);
+        .slice(0, 20); // Plus d'items pour plus de choix
     }
 
     // Mode production : essayer DofAPI puis fallback sur données génériques

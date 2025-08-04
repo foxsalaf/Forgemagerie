@@ -32,6 +32,16 @@ export class DofapiService {
   }
 
   async searchItem(query: string): Promise<DofapiItem[]> {
+    // Utiliser toujours notre base Retro en priorité pour de meilleurs résultats
+    console.log('🏛️ Recherche dans la base Retro pour:', query);
+    const retroResults = this.searchRetroDatabase(query);
+    
+    if (retroResults.length > 0) {
+      console.log(`✅ ${retroResults.length} items trouvés dans la base Retro`);
+      return retroResults;
+    }
+
+    // Fallback sur API externe si pas de résultats Retro
     if (!this.apiAvailable) {
       console.log('🔄 API indisponible, utilisation des données locales');
       return this.searchLocalItems(query);
@@ -64,6 +74,14 @@ export class DofapiService {
       this.apiAvailable = false;
       return this.searchLocalItems(query);
     }
+  }
+
+  private searchRetroDatabase(query: string): DofapiItem[] {
+    const { RetroDatabaseService } = require('./retro-database.service');
+    const retroDb = new RetroDatabaseService();
+    const items = retroDb.searchItems(query);
+    
+    return items.map((item: any) => this.convertLocalToDofapi(item));
   }
 
   private searchLocalItems(query: string): DofapiItem[] {

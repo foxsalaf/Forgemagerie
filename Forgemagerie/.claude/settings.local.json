@@ -14,7 +14,9 @@
       "Bash(pkill:*)",
       "Bash(npm run build:*)",
       "Bash(fuser:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(PORT=3003 npx ts-node src/server.ts)"
     ],
     "deny": []
   }
